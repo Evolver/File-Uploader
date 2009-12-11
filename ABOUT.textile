@@ -1,8 +1,7 @@
 
 <h1>File Uploader</h1>
 
-File Uploader is a flash-based file uploader, alternative to SWFUpload. It is robust,
-fast and easy to use.
+File Uploader is a flash-based file uploader, alternative to SWFUpload. It is robust, fast and easy to use.
 
 <b style="color:red;">File Uploader is under development and it's implementation is experimental. No stable release is currently available</b>
 
@@ -10,6 +9,7 @@ fast and easy to use.
 
 <ul>
   <li>Lighweight, uses one SWF embed for all uploader instances on single page</li>
+  <li>Supports multiple file selection and parallel uploading</li>
   <li>Supports multiple uploaders (queues) per page without impact on performance</li>
   <li>Supports concurrent uploading</li>
   <li>Supports per-file POST arguments</li>
