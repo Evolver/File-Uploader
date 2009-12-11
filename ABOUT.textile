@@ -113,7 +113,7 @@ File Uploader consists of four elements you need to include in your webpage.
 
 <h3>Examples</h3>
 
-You can view live examples <a href="http://www.stepanov.lv/uploader">here</a> (coming soon).
+You can view a live debugging test <a href="http://www.stepanov.lv/uploader/test.html">here</a>.
 
 <h2>Supported browsers</h2>
 
