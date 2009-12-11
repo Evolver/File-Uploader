@@ -5,6 +5,7 @@ File Uploader is a flash-based file uploader, alternative to SWFUpload. It is ro
 fast and easy to use.
 
 <h2>What makes it great:</h2>
+
 <ul>
   <li>Lighweight, uses one SWF embed for all uploader instances on single page</li>
   <li>Supports multiple uploaders (queues) per page without impact on performance</li>
@@ -23,6 +24,7 @@ fast and easy to use.
 <h3>Make a File Uploader bundle you need</h3>
 
 File Uploader consists of four elements you need to include in your webpage.
+
 <ol>
   <li>Dependent library (such as jQuery, Prototype.js or something else) and it's binding for FileUploader [located in <b>src/js/dep/</b>]</li>
   <li>File Uploader core file [<b>src/js/fileUploader.core.js</b>]</li>
@@ -31,6 +33,7 @@ File Uploader consists of four elements you need to include in your webpage.
 </ol>
 
 <h3>Deploy File Uploader on your webserver</h3>
+
 <ol>
   <li>Take the files you collected</li>
   <li>Deploy them on your webserver</li>
@@ -40,7 +43,8 @@ File Uploader consists of four elements you need to include in your webpage.
 </ol>
 
 <h3>Using File Uploader</h3>
-<code>
+
+<pre>
   // instantiate uploader
   var uploader =new fileUploader.Uploader({
     // url where to upload the file
@@ -105,20 +109,11 @@ File Uploader consists of four elements you need to include in your webpage.
   
   // deploy
   uploader.attach( document.getElementById( 'myButton'));
-</code>
+</pre>
 
-<h3>Example</h3>
-<code>
-  <script type="text/javascript" src="jquery-1.3.2.js"></script>
-  <script type="text/javascript" src="fileUploader.dependency.jQuery.js"></script>
-  <script type="text/javascript" src="fileUploader.core.js"></script>
-  <script type="text/javascript" src="fileUploader.api.js"></script>
-</code>
+<h3>Examples</h3>
 
-...
-
-<code>
-</code>
+You can view live examples <a href="http://www.stepanov.lv/uploader">here</a> (coming soon).
 
 <h2>Supported browsers</h2>
 
