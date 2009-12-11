@@ -4,6 +4,8 @@
 File Uploader is a flash-based file uploader, alternative to SWFUpload. It is robust,
 fast and easy to use.
 
+<b style="color:red;">File Uploader is under development and it's implementation is experimental. No stable release is currently available</b>
+
 <h2>What makes it great:</h2>
 
 <ul>
