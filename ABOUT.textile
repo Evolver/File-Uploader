@@ -1,0 +1,20 @@
+
+<h1>File Uploader</h1>
+
+File Uploader is a flash-based file uploader, alternative to SWFUpload. It is robust,
+fast and easy to use.
+
+<h2>What makes it great:</h2>
+<ul>
+  <li>Lighweight, uses one SWF embed for all uploader instances on single page</li>
+  <li>Supports multiple uploaders (queues) per page without impact on performance</li>
+  <li>Supports concurrent uploading</li>
+  <li>Supports per-file POST arguments</li>
+  <li>Easy-to-use high level API out of box</li>
+  <li>Exports low level API to create custom high level APIs</li>
+  <li>Supports uploading automatic start</li>
+  <li>Does just what you expect it to do</li>
+  <li>It is Open, alter and use as you wish</li>
+</ul>
+
+More info to come...
