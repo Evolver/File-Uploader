@@ -3,7 +3,7 @@
 
 File Uploader is a flash-based file uploader, alternative to SWFUpload. It is robust, fast and easy to use.
 
-<b style="color:red;">File Uploader is under development and it's implementation is experimental. No stable release is currently available</b>
+<b style="color:red;">File Uploader is under development and it's implementation is experimental. No stable release is currently available.</b>
 
 <h2>What makes it great:</h2>
 
@@ -11,40 +11,51 @@ File Uploader is a flash-based file uploader, alternative to SWFUpload. It is ro
   <li>Lighweight, uses one SWF embed for all uploader instances on single page</li>
   <li>Supports multiple file selection and parallel uploading</li>
   <li>Supports multiple uploaders (queues) per page without impact on performance</li>
-  <li>Supports concurrent uploading</li>
   <li>Supports per-file POST arguments</li>
   <li>Easy-to-use high level API out of box</li>
   <li>Exports low level API to create custom high level APIs</li>
-  <li>Supports uploading automatic start</li>
-  <li>Designed to support any JavaScript library (currently only jQuery is supported)</li>
-  <li>Does just what you expect it to do</li>
-  <li>It is Open, alter and use as you wish</li>
+  <li>Supports automatic upload start</li>
+  <li>Designed to support any JavaScript library</li>
+  <li>Licensed under <a href="http://www.gnu.org/licenses/gpl-2.0.html">GPL v2</a></li>
 </ul>
 
 <h2>Installation and usage</h2>
 
-<h3>Make a File Uploader bundle you need</h3>
+<h3>Step 1 - Make a File Uploader bundle you need</h3>
 
-File Uploader consists of four elements you need to include in your webpage.
+File Uploader consists of four elements you need to include in your webpage:
 
 <ol>
   <li>Dependent library (such as jQuery, Prototype.js or something else) and it's binding for FileUploader [located in <b>src/js/dep/</b>]</li>
   <li>File Uploader core file [<b>src/js/fileUploader.core.js</b>]</li>
   <li>File Uploader public API file (API you will use to work with uploader) [located in <b>src/js/api/</b>]</li>
-  <li>SWF file [<b>bin/flash/FileUploader.swf</b>]</li>
+  <li>File Uploader SWF file [<b>bin/flash/FileUploader.swf</b>]</li>
 </ol>
 
-<h3>Deploy File Uploader on your webserver</h3>
+<h3>Step 2 - Deploy File Uploader on your webserver</h3>
 
 <ol>
-  <li>Take the files you collected</li>
-  <li>Deploy them on your webserver</li>
-  <li>Make sure fileUploader.core.js is configured correctly and knows location of your SWF file</li>
-  <li>Include <b>dependent library JS</b> code, include <b>dependent library File Uploader bindings</b>, include <b>fileUploader.core.js</b> and <b>File Uploader public API</b> file.</li>
+  <li>Take the files you collected and deploy them on your webserver</li>
+  <li>Make sure <b>fileUploader.core.js</b> is configured correctly and URL of File Uploader SWF file is correct</li>
+  <li>Include <b>dependent library JS</b> code, include <b>dependent library File Uploader bindings</b>, include <b>fileUploader.core.js</b> and <b>File Uploader public API</b> file.
+  
+    Example:
+    <pre>
+        <!-- dependent library and binding -->
+        <script type="text/javascript" src="jquery-1.3.2.js"></script>
+        <script type="text/javascript" src="fileUploader.dependency.jQuery.js"></script>
+        
+        <!-- uploader core file -->
+        <script type="text/javascript" src="fileUploader.core.js"></script>
+        
+        <!-- uploader public API -->
+        <script type="text/javascript" src="fileUploader.Uploader.js"></script>
+    </pre>
+  </li>
   <li>You are ready to go</li>
 </ol>
 
-<h3>Using File Uploader</h3>
+<h3>Step 3 - Use File Uploader</h3>
 
 <pre>
   // instantiate uploader
@@ -115,13 +126,14 @@ File Uploader consists of four elements you need to include in your webpage.
 
 <h3>Examples</h3>
 
-You can view a live debugging test <a href="http://www.stepanov.lv/uploader/test.html">here</a>.
+You can view live debugging test <a href="http://www.stepanov.lv/uploader/test.html">here</a>.
 
 <h2>Supported browsers</h2>
 
 File Uploader was tested and is working as expected in:
 
 <ul>
+  <li>Win32 Flash player 10.0.22+</li>
   <li>Internet Explorer 7</li>
   <li>Internet Explorer 8</li>
   <li>Firefox 3.5.5</li>
