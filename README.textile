@@ -41,18 +41,17 @@ File Uploader consists of four elements you need to include in your webpage:
   
     Example:
     <pre>
-        <!-- dependent library and binding -->
-        <script type="text/javascript" src="jquery-1.3.2.js"></script>
-        <script type="text/javascript" src="fileUploader.dependency.jQuery.js"></script>
+        &lt;!-- dependent library and binding --&gt;
+        &lt;script type="text/javascript" src="jquery-1.3.2.js">&lt;/script&gt;
+        &lt;script type="text/javascript" src="fileUploader.dependency.jQuery.js">&lt;/script&gt;
         
-        <!-- uploader core file -->
-        <script type="text/javascript" src="fileUploader.core.js"></script>
+        &lt;!-- uploader core file --&gt;
+        &lt;script type="text/javascript" src="fileUploader.core.js">&lt;/script&gt;
         
-        <!-- uploader public API -->
-        <script type="text/javascript" src="fileUploader.Uploader.js"></script>
+        &lt;!-- uploader public API --&gt;
+        &lt;script type="text/javascript" src="fileUploader.Uploader.js"&gt;&lt;/script&gt;
     </pre>
   </li>
-  <li>You are ready to go</li>
 </ol>
 
 <h3>Step 3 - Use File Uploader</h3>
