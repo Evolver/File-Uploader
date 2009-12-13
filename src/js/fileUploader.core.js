@@ -61,6 +61,9 @@ api.debug =function( msg){
   //  messages
 };
 
+// show alpha-transparent red rectangle over button elements
+api.visualDebug =false;
+
 // methods to handle flash events / call flash methods
 var flash ={};
 
@@ -94,52 +97,52 @@ flash.handlers.ready =function( elementId) {
   
   // in case we had focus on button while flash was
   // loading, restore that focus
-  buttonFollow();
+  ButtonFollow();
 };
 
 // file dialog is opened
 flash.handlers.dialogOpen =function( buttonId) {
-  api.handlers.dialogOpen( buttonId);
+  return api.handlers.dialogOpen( buttonId);
 };
 
 // file dialog is closed
 flash.handlers.dialogClose =function( buttonId, activeUploadCount) {
-  api.handlers.dialogClose( buttonId, activeUploadCount);
+  return api.handlers.dialogClose( buttonId, activeUploadCount);
 };
 
 // file has been added to queue
 flash.handlers.fileSelect =function( buttonId, fileId, fileInfo) {
-  api.handlers.fileSelect( buttonId, fileId, fileInfo);
+  return api.handlers.fileSelect( buttonId, fileId, fileInfo);
 };
 
 // file has been removed from queue
 flash.handlers.fileRemove =function( fileId, fileInfo) {
-  api.handlers.fileRemove( fileId, fileInfo);
+  return api.handlers.fileRemove( fileId, fileInfo);
 };
 
 // file upload has been started
 flash.handlers.fileUploadStart =function( fileId, fileInfo) {
-  api.handlers.fileUploadStart( fileId, fileInfo);
+  return api.handlers.fileUploadStart( fileId, fileInfo);
 };
 
 // file is uploading...
 flash.handlers.fileUploadProgress =function( fileId, fileInfo, bytesLoaded, bytesTotal, percComplete) {
-  api.handlers.fileUploadProgress( fileId, fileInfo, bytesLoaded, bytesTotal, percComplete);
+  return api.handlers.fileUploadProgress( fileId, fileInfo, bytesLoaded, bytesTotal, percComplete);
 };
 
 // file upload error encountered
 flash.handlers.fileUploadError =function( fileId, fileInfo, errorMsg) {
-  api.handlers.fileUploadError( fileId, fileInfo, errorMsg);
+  return api.handlers.fileUploadError( fileId, fileInfo, errorMsg);
 };
 
 // file upload was successful
 flash.handlers.fileUploadSuccess =function( fileId, fileInfo, serverData, filesRemaining) {
-  api.handlers.fileUploadSuccess( fileId, fileInfo, serverData, filesRemaining);
+  return api.handlers.fileUploadSuccess( fileId, fileInfo, serverData, filesRemaining);
 };
 
 // file upload has completed
 flash.handlers.fileUploadComplete =function( fileId, fileInfo, queueSize, removeFromQueue) {
-  api.handlers.fileUploadComplete( fileId, fileInfo, queueSize, removeFromQueue);
+  return api.handlers.fileUploadComplete( fileId, fileInfo, queueSize, removeFromQueue);
 };
 
 
@@ -259,31 +262,31 @@ api.bridge =function( elementId, methodName, args) {
       flash.handlers.ready( elementId);
     break;
     case 'dialogOpen':
-      flash.handlers.dialogOpen( args[0]);
+      return flash.handlers.dialogOpen( args[0]);
     break;
     case 'dialogClose':
-      flash.handlers.dialogClose( args[0], args[1]);
+      return flash.handlers.dialogClose( args[0], args[1]);
     break;
     case 'fileSelect':
-      flash.handlers.fileSelect( args[0], args[1], args[2]);
+      return flash.handlers.fileSelect( args[0], args[1], args[2]);
     break;
     case 'fileRemove':
-      flash.handlers.fileRemove( args[0], args[1]);
+      return flash.handlers.fileRemove( args[0], args[1]);
     break;
     case 'fileUploadStart':
-      flash.handlers.fileUploadStart( args[0], args[1]);
+      return flash.handlers.fileUploadStart( args[0], args[1]);
     break;
     case 'fileUploadProgress':
-      flash.handlers.fileUploadProgress( args[0], args[1], args[2], args[3], args[4]);
+      return flash.handlers.fileUploadProgress( args[0], args[1], args[2], args[3], args[4]);
     break;
     case 'fileUploadError':
-      flash.handlers.fileUploadError( args[0], args[1], args[2]);
+      return flash.handlers.fileUploadError( args[0], args[1], args[2]);
     break;
     case 'fileUploadSuccess':
-      flash.handlers.fileUploadSuccess( args[0], args[1], args[2], args[3]);
+      return flash.handlers.fileUploadSuccess( args[0], args[1], args[2], args[3]);
     break;
     case 'fileUploadComplete':
-      flash.handlers.fileUploadComplete( args[0], args[1], args[2], args[3]);
+      return flash.handlers.fileUploadComplete( args[0], args[1], args[2], args[3]);
     break;
   }
 };
@@ -302,7 +305,7 @@ api.create =function( elem, settings) {
     
   // make sure all settings are present
   if( settings.id ===undefined)
-    settings.id =allocButtonId();
+    settings.id =AllocButtonId();
   if( settings.fileFilter ===undefined)
     settings.fileFilter ='*.*';
   if( settings.fileFilterName ===undefined)
@@ -326,7 +329,7 @@ api.create =function( elem, settings) {
       return;
     
     // focus target element
-    focusButton( elem);
+    FocusButton( elem);
   });
   
   // create new button
@@ -342,7 +345,7 @@ api.create =function( elem, settings) {
   });
   
   // execute button follower immediately
-  buttonFollow();
+  ButtonFollow();
   
   // return button id
   return settings.id;
@@ -361,7 +364,7 @@ api.remove =function( elem) {
       // see if button was focused
       if( button.focused)
         // loose focused button
-        looseButton();
+        LooseButton();
         
       // remove button from array
       buttons.splice( i, 1);
@@ -379,15 +382,39 @@ api.remove =function( elem) {
   }
 };
 
+// update button settings
+api.update =function( buttonId, settings) {
+  // find button entry
+  var entry =GetButtonById( buttonId);
+  
+  // button not found?
+  if( entry ===undefined)
+    throw 'Button #' +buttonId +' not found';
+    
+  // update settings
+  if( settings.fileFilter !==undefined)
+    entry.settings.fileFilter =settings.fileFilter;
+  if( settings.fileFilterName !==undefined)
+    entry.settings.fileFilterName =settings.fileFilterName;
+  if( settings.multi !==undefined)
+    entry.settings.multi =settings.multi;
+    
+  // see if button is focused
+  if( entry.focused) {
+    // adjust movie to button and send new settings
+    AdjustMovieToButton( entry, true);
+  }
+};
+
 // internal
 
 // allocate button id
-function allocButtonId() {
+function AllocButtonId() {
   return buttonIdOffset++;
 };
 
 // get button by button id
-function getButtonById( id) {
+function GetButtonById( id) {
   for( var i =0; i < buttons.length; ++i)
     if( buttons[i].settings.id ==id)
       return buttons[i];
@@ -397,7 +424,7 @@ function getButtonById( id) {
 };
 
 // focus target element
-function focusButton( elem) {
+function FocusButton( elem) {
   // find target button
   var button =null;
   for( var i =0; i < buttons.length; ++i) {
@@ -425,7 +452,7 @@ function focusButton( elem) {
   }
   
   // adjust movie to button
-  adjustMovieToButton( button);
+  AdjustMovieToButton( button);
   
   // set maximum z-index so that flash object is always on top
   // of other elements (IE bug fix)
@@ -454,7 +481,7 @@ function GetObjectAndEmbed() {
 
 // adjust movie container object to button position
 // and sizing
-function adjustMovieToButton( button, justFocused) {
+function AdjustMovieToButton( button, justFocused) {
   if( justFocused ===undefined)
     justFocused =true;
     
@@ -493,7 +520,7 @@ function adjustMovieToButton( button, justFocused) {
 };
 
 // loose button from focus
-function looseButton() {
+function LooseButton() {
   // squeeze the button so it does not get accidentally hovered
   var elems =GetObjectAndEmbed();
   var i;
@@ -519,13 +546,13 @@ function looseButton() {
   }
   
   // assign new button positions
-  buttonFollow();
+  ButtonFollow();
 };
 
 // see which buttons are registered to the file uploader,
 // check if element positions / dimensions have changed,
 // and if so, adjust new overlay positioning
-function buttonFollow() {
+function ButtonFollow() {
   // iterate all buttons
   var button;
   var overlay;
@@ -576,7 +603,7 @@ function buttonFollow() {
       // if button is focused, adjust flash object position and size
       if( button.focused) {
         // adjust focused button's width and height
-        adjustMovieToButton( button, false);
+        AdjustMovieToButton( button, false);
       }
     }
   }
@@ -607,8 +634,8 @@ api.load =function() {
     	'<param name="scale" value="exactfit" />' +
     	'<param name="play" value="false" />' +
     	'<param name="loop" value="false" />' +
-    	'<param name="flashvars" value="elementId=fileUploader_OBJECT&amp;bridgeFn=fileUploader.bridge&amp;debugFn=fileUploader.debug" />' +
-    	'<embed id="fileUploader_EMBED" src="' +swfUrl +'" flashvars="elementId=fileUploader_EMBED&amp;bridgeFn=fileUploader.bridge&amp;debugFn=fileUploader.debug" width="1px" height="1px" allowScriptAccess="always" type="application/x-shockwave-flash" pluginspage="http://www.adobe.com/go/getflashplayer" wmode="transparent" menu="false" quality="low" scale="exactfit" play="false" loop="false" />' +
+    	'<param name="flashvars" value="elementId=fileUploader_OBJECT&amp;bridgeFn=fileUploader.bridge&amp;debugFn=fileUploader.debug&amp;visualDebug=' +(api.visualDebug ? '1' : '0') +'" />' +
+    	'<embed id="fileUploader_EMBED" src="' +swfUrl +'" flashvars="elementId=fileUploader_EMBED&amp;bridgeFn=fileUploader.bridge&amp;debugFn=fileUploader.debug&amp;visualDebug=' +(api.visualDebug ? '1' : '0') +'" width="1px" height="1px" allowScriptAccess="always" type="application/x-shockwave-flash" pluginspage="http://www.adobe.com/go/getflashplayer" wmode="transparent" menu="false" quality="low" scale="exactfit" play="false" loop="false" />' +
     '</object>';
   
   // create container element
@@ -636,7 +663,7 @@ api.load =function() {
       return;
 
     // loose button focus
-    looseButton();
+    LooseButton();
   });
 
   // remember movie container element
@@ -655,10 +682,10 @@ api.load =function() {
   }
   
   // create follower execution interval
-  followerTimer =setInterval( buttonFollow, 500);
+  followerTimer =setInterval( ButtonFollow, 500);
   
   // bind window on resizing to adjust button positioning
-  dependency.bind( window, 'resize', buttonFollow);
+  dependency.bind( window, 'resize', ButtonFollow);
 };
 
 // deinitialize uploader
@@ -694,7 +721,7 @@ api.unload =function(){
   api.ready =false;
   
   // remove window resizing callback
-  dependency.unbind( window, 'resize', buttonFollow);
+  dependency.unbind( window, 'resize', ButtonFollow);
 };
 
 
@@ -716,6 +743,9 @@ api.handlers.dialogClose =function( buttonId, activeUploadCount) {
 // file has been added to queue
 api.handlers.fileSelect =function( buttonId, fileId, fileInfo) {
   api.debug( '[FLASH] fileSelect - button=' +buttonId +', file=' +fileId +', name=' +fileInfo.name);
+  
+  // add file to queue
+  return true;
 };
 
 // file has been removed from queue

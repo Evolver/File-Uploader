@@ -136,13 +136,23 @@ fileUploader.handlers.fileSelect =function( buttonId, fileId, fileInfo) {
   // get custom upload data
   var uploadData =uploader.onSelect( fileId, fileInfo);
   
-    // see if upload data was set during event handling
-  if(  uploadData !==undefined && uploadData !==null) {
-    // check upload data
+  // check if any value is returned
+  if( uploadData ===undefined)
+    uploadData =true;
+  
+  // see if returned value is false
+  if( uploadData ===false) {
+    // do not add file to queue
+    return false;
+  }
+  
+  // see if upload data was set during event handling
+  if( typeof uploadData =='object') {
+    // use specified upload data
     CheckUploadData( uploadData);
     
   } else {
-    // use default info
+    // use default upload data
     uploadData =uploader.uploadData;
   }
 
@@ -158,6 +168,9 @@ fileUploader.handlers.fileSelect =function( buttonId, fileId, fileInfo) {
   
   // associate file with button
   files[ fileId] =buttonId;
+  
+  // add file to queue
+  return true;
 };
 
 // file has been removed from queue
@@ -285,10 +298,23 @@ with( api.Uploader) {
   // start uploading automatically
   prototype.autoStart =true;
   
+  // file filter
+  prototype.fileFilter ='*.*';
+  
+  // file filter name
+  prototype.fileFilterName ='All Files';
+  
+  // allow selection of multiple files
+  prototype.multi =true;
+  
   // attach a button to element
   prototype.attach =function( elem){
     // register button
-    var buttonId =this.buttonId =fileUploader.create( elem);
+    var buttonId =this.buttonId =fileUploader.create( elem, {
+      'fileFilter': this.fileFilter,
+      'fileFilterName': this.fileFilterName,
+      'multi': this.multi
+    });
     
     // store element's reference
     this.elem =elem;
@@ -313,6 +339,16 @@ with( api.Uploader) {
     
     // reset properties
     this.buttonId =null;
+  };
+  
+  // update assigned settings
+  prototype.update =function() {
+    // set button settings
+    fileUploader.update( this.buttonId, {
+      'fileFilter': this.fileFilter,
+      'fileFilterName': this.fileFilterName,
+      'multi': this.multi
+    });
   };
   
   // get current file queue

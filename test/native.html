@@ -21,45 +21,51 @@
 
   <script type="text/javascript">
     function debug( msg) {
-      $('#debug').append( msg +'<br />');  
+     $('#debug').append( msg +'<br />');  
     }
     
     debug( '<b>Debug info:</b>');
     
-     var up =new fileUploader.Uploader({
-  	   'url': '/test/receive.php'
-  	 });
-  	 
-  	 // create handlers
-  	 up.onDialogOpen =function() {
-  	   debug( 'Dialog open');
-  	 };
-  	 up.onSelect =function( fileId, fileInfo) {
-  	   debug( 'Select file #' +fileId +' - ' +fileInfo.name + ' (size=' +fileInfo.size +')');
-     };
-  	 up.onRemove =function( fileId, fileInfo) {
-  	   debug( 'Remove file #' +fileId +' - ' +fileInfo.name);
-     };
-     up.onDialogClose =function() {
-  	   debug( 'Dialog close');
-  	 };
-  	 up.onUploadStart =function( fileId, fileInfo) {
-  	   debug( 'Start upload #' +fileId +' - ' +fileInfo.name);
-     };
-     up.onUploadError =function( fileId, fileInfo, errorMsg) {
-       debug( 'Upload error #' +fileId +' - ' +fileInfo.name +' (' +errorMsg +')');
-     };
-     up.onUploadProgress =function( fileId, fileInfo, bytesLoaded, bytesTotal, percComplete) {
-       debug( 'Upload progress #' +fileId +' - ' +fileInfo.name + ' (' +percComplete +'%)');
-     };
-     up.onUploadSuccess =function( fileId, fileInfo, serverData, queueLength) {
-       debug( 'Upload success #' +fileId +' - ' +fileInfo.name);
-     };
-  	 up.onUploadComplete =function( fileId, fileInfo) {
-  	   debug( 'Upload complete #' +fileId +' - ' +fileInfo.name);
-     };
-     
-  	 up.attach( document.getElementById( 'myButton'));
+    // enable visual debugging
+    fileUploader.visualDebug =true;
+    
+    // dump file uploader debug info into debug function
+    fileUploader.debug =debug;
+    
+    var up =new fileUploader.Uploader({
+     'url': '/test/receive.php'
+    });
+    
+    // create handlers
+    up.onDialogOpen =function() {
+     debug( 'Dialog open');
+    };
+    up.onSelect =function( fileId, fileInfo) {
+     debug( 'Select file #' +fileId +' - ' +fileInfo.name + ' (size=' +fileInfo.size +')');
+    };
+    up.onRemove =function( fileId, fileInfo) {
+     debug( 'Remove file #' +fileId +' - ' +fileInfo.name);
+    };
+    up.onDialogClose =function() {
+     debug( 'Dialog close');
+    };
+    up.onUploadStart =function( fileId, fileInfo) {
+     debug( 'Start upload #' +fileId +' - ' +fileInfo.name);
+    };
+    up.onUploadError =function( fileId, fileInfo, errorMsg) {
+     debug( 'Upload error #' +fileId +' - ' +fileInfo.name +' (' +errorMsg +')');
+    };
+    up.onUploadProgress =function( fileId, fileInfo, bytesLoaded, bytesTotal, percComplete) {
+     debug( 'Upload progress #' +fileId +' - ' +fileInfo.name + ' (' +percComplete +'%)');
+    };
+    up.onUploadSuccess =function( fileId, fileInfo, serverData, queueLength) {
+     debug( 'Upload success #' +fileId +' - ' +fileInfo.name);
+    };
+    up.onUploadComplete =function( fileId, fileInfo) {
+     debug( 'Upload complete #' +fileId +' - ' +fileInfo.name);
+    };
+    
+    up.attach( document.getElementById( 'myButton'));
 
   </script>
   

@@ -35,17 +35,19 @@ with( fileUploader.Uploader.prototype) {
   // handle file selection
   onSelect =function( id, fileInfo) {
     // reference default upload data
-    var uploadData =this.uploadData;
+    var returnData ={
+      'value': true
+    };
     
     // trigger callback
     $(this.elem).trigger( 'uploadFileSelect', {
       'fileId': id,
       'fileInfo': fileInfo,
-      'uploadData': uploadData
+      'returnData': returnData
     });
     
-    // return used upload data
-    return uploadData;
+    // pass return value to native API
+    return returnData.value;
   };
   
   // handle file removal

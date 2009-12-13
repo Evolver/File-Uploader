@@ -1,4 +1,4 @@
-/**
+﻿/**
   * Author: Dmitry Stepanov
   * E-Mail: dmitrij@stepanov.lv
   * URL: http://www.stepanov.lv
@@ -190,7 +190,7 @@ package {
 		}
 		
 		// add file from file reference object
-		protected function addFile( ref:FileReference):uint {
+		protected function addFile( ref:FileReference) {
 			Debug.write( 'FileUploader::addFile()');
 			
 			var id =this.allocFileId();
@@ -199,6 +199,13 @@ package {
 			
 			// get current settings
 			var buttonId =this.settings.buttonId;
+			
+			// notify of file addition
+			var ret =this.callExternal( 'fileSelect', buttonId, id, this.getFileInfoFromRef( ref));
+			if( Boolean( ret) ===false) {
+				// do not add file to queue
+				return;
+			}
 			
 			// add file to queue
 			this.queue[ id] =info ={
@@ -209,10 +216,7 @@ package {
 				'responseTimeout': null,
 				'timeoutTimer': null
 			};
-			
-			// notify of file addition
-			this.callExternal( 'fileSelect', buttonId, id, this.getFileInfoFromRef( ref));
-			
+
 			// add event listeners to the file reference object
 			
 			// uploading started
@@ -340,9 +344,6 @@ package {
 				uploadErrorFn( 'I/O error: ' +e.text);
 				uploadCompleteFn( false);
 			});
-			
-			// return file id
-			return id;
 		}
 		
 		// remove file by id

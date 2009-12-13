@@ -1,6 +1,2 @@
 
-- Implement file filters in public API
-
-- Implement possibility to return true/false from onFileSelect to instantly remove file from queue (with this file size checking can be implemented)
-
 - Graceful degradation if Flash fails to load
