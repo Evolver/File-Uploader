@@ -51,15 +51,15 @@ File Uploader consists of four elements you need to include in your webpage:
   
     Example:
     <pre>
-        &lt;!-- dependent library and binding --&gt;
-        &lt;script type="text/javascript" src="/src/js/dep/jQuery/jquery-1.3.2.js">&lt;/script&gt;
-        &lt;script type="text/javascript" src="/src/js/dep/jQuery/fileUploader.jQuery.js">&lt;/script&gt;
-        
-        &lt;!-- uploader core file --&gt;
-        &lt;script type="text/javascript" src="/src/js/fileUploader.core.js">&lt;/script&gt;
-        
-        &lt;!-- uploader public API --&gt;
-        &lt;script type="text/javascript" src="/src/js/api/fileUploader.Uploader.js"&gt;&lt;/script&gt;
+  &lt;!-- dependent library and binding --&gt;
+  &lt;script type="text/javascript" src="/src/js/dep/jQuery/jquery-1.3.2.js">&lt;/script&gt;
+  &lt;script type="text/javascript" src="/src/js/dep/jQuery/fileUploader.jQuery.js">&lt;/script&gt;
+  
+  &lt;!-- uploader core file --&gt;
+  &lt;script type="text/javascript" src="/src/js/fileUploader.core.js">&lt;/script&gt;
+  
+  &lt;!-- uploader public API --&gt;
+  &lt;script type="text/javascript" src="/src/js/api/fileUploader.Uploader.js"&gt;&lt;/script&gt;
     </pre>
   </li>
 </ol>
@@ -220,7 +220,7 @@ File Uploader consists of four elements you need to include in your webpage:
 <h3>Examples</h3>
 
 You can view live debugging test of native API <a href="http://www.stepanov.lv/uploader/test.html">here</a>.
-Other tests you can find in /test/ directory of File-Uploader repo.
+Other tests you can find in <b>/test/</b> directory of File-Uploader repo. If you have cloned repo and trying to view tests from your local hard drive, the tests won't work because of Flash's security features. Upload tests to a domain and access them via browser.
 
 <h2>Supported browsers</h2>
 
