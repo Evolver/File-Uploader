@@ -209,12 +209,30 @@ package {
 			
 			// add file to queue
 			this.queue[ id] =info ={
-				'progress': 0,
+				// default queue item state
 				'state': FileUploader.STATE_PENDING,
+				// FileReference object associated with queue item
 				'ref': ref,
+				// do we expect response from server after uploading file?
 				'expectResponse': true,
+				// maximum time for uploading file
+				'uploadTimeout': null,
+				// maximum time for awaiting response from server
 				'responseTimeout': null,
-				'timeoutTimer': null
+				// timeout timer
+				'timeoutTimer': null,
+				// speed calculation timer
+				'speedTimer': null,
+				// speed timer tick count
+				'speedTickCount': 0,
+				// speed counter (used in ProgressEvent.PROGRESS to calculate current speed)
+				'speedCounter': 0,
+				// current uploading speed
+				'speed': 0,
+				// current average uploading speed
+				'averageSpeed': 0,
+				// bytes transfered
+				'bytesTransfered': 0
 			};
 
 			// add event listeners to the file reference object
@@ -226,30 +244,63 @@ package {
 				
 				// reference entry
 				var entry =self.queue[ id];
+				var fileInfo =self.getFileInfoFromRef( ref);
+				
+				// timer object container
+				var t:Timer;
 				
 				// notify of uploading start
-				self.callExternal( 'fileUploadStart', id, self.getFileInfoFromRef( ref));
+				self.callExternal( 'fileUploadStart', id, fileInfo);
 				
-				Debug.write( 'Uploading file #' +id +' (' +entry.ref.name +'), expectResponse=' +entry.expectResponse +', responseTimeout=' +entry.responseTimeout);
+				Debug.write( 'Uploading file #' +id +' (' +entry.ref.name +'), expectResponse=' +entry.expectResponse +', uploadTimeout=' +entry.uploadTimeout +', responseTimeout=' +entry.responseTimeout);
+				
+				// begin upload timing if specified
+				if( entry.uploadTimeout !==null) {
+					// assign delay
+					t =new Timer( entry.uploadTimeout *1000, 1);
 					
-				// initiate timeout timer if requested
-				if( entry.responseTimeout !==null) {
-					var t:Timer =new Timer( entry.responseTimeout *1000, 1);
-					
-					// create event listener to act accordingly on timeout
+					// listen to timeout
 					t.addEventListener( TimerEvent.TIMER_COMPLETE, function(){
-						Debug.write( '[EVENT] file - TimerEvent.TIMER_COMPLETE (timeout)');
+						// uploading timed out
+						Debug.write( '[EVENT] file - TimerEvent.TIMER_COMPLETE (uploading timeout)');
 						
 						// stop uploading process
 						ref.cancel();
 						
 						// notify of error
-						uploadErrorFn( 'Response awaiting timeout');
+						uploadErrorFn( 'Uploading timeout');
 						uploadCompleteFn( false);
 					});
 					
-					// assign timer to entry
+					// assign current timer
 					entry.timeoutTimer =t;
+					
+					// start timing
+					t.start();
+				}
+				
+				// FIXME: in the future make the switch that will deactivate speed calculation for performance optimization
+				// begin speed timing
+				if( true) {
+					t =new Timer( 1000, 1);
+					// assign timer callback
+					t.addEventListener( TimerEvent.TIMER_COMPLETE, function(){
+						// update average speed
+						entry.averageSpeed =Math.floor( entry.bytesTransfered / ++entry.speedTickCount);
+						// update current speed
+						entry.speed =entry.speedCounter;
+						// reset speed counter
+						entry.speedCounter =0;
+						
+						// restart timer
+						t.start();
+						
+						// fire transfer rate event
+						self.callExternal( 'fileUploadTransferRate', id, fileInfo, entry.speed, entry.averageSpeed);
+					});
+					
+					// assign timer
+					entry.speedTimer =t;
 					
 					// start timer
 					t.start();
@@ -264,11 +315,24 @@ package {
 				// reference entry
 				var entry =self.queue[id];
 				
-				// remove timer
+				// stop timeout timer
 				if( entry.timeoutTimer !==null) {
 					entry.timeoutTimer.stop();
 					entry.timeoutTimer =null;
 				}
+				
+				// stop speed timer
+				if( entry.speedTimer !==null) {
+					entry.speedTimer.stop();
+					entry.speedTimer =null;
+				}
+				
+				// reset counters
+				entry.bytesTransfered =0;
+				entry.speedTickCount =0;
+				entry.speed =0;
+				entry.averageSpeed =0;
+				entry.speedCounter =0;
 				
 				// notify of upload completion
 				self.callExternal( 'fileUploadComplete', id, self.getFileInfoFromRef( ref), self.getQueueSize(), removeFromQueue);
@@ -284,7 +348,17 @@ package {
 			// uploading progress...
 			ref.addEventListener( ProgressEvent.PROGRESS, function( e:ProgressEvent){
 				Debug.write( '[EVENT] file - ProgressEvent.PROGRESS');
+
+				// reference entry
+				var entry =self.queue[id];
 				
+				// increment transfer counter
+				entry.speedCounter +=(e.bytesLoaded -entry.bytesTransfered);
+				
+				// remember last bytes loaded
+				entry.bytesTransfered =e.bytesLoaded;
+				
+				// notify of uploading progress
 				self.callExternal( 'fileUploadProgress', id, self.getFileInfoFromRef( ref), e.bytesLoaded, e.bytesTotal, int(( e.bytesLoaded / e.bytesTotal) *100));
 			});
 			
@@ -305,11 +379,50 @@ package {
 				
 				// reference entry
 				var entry =self.queue[ id];
+				
+				// stop timeout timer
+				if( entry.timeoutTimer !==null) {
+					entry.timeoutTimer.stop();
+					entry.timeoutTimer =null;
+				}
+				
+				// stop speed timer
+				if( entry.speedTimer !==null) {
+					entry.speedTimer.stop();
+					entry.speedTimer =null;
+				}
 
 				if( !entry.expectResponse) {
 					// call if response is not being expected
 					uploadSuccessFn( null);
 					uploadCompleteFn( true);
+					
+				} else {
+					// awaiting for server response
+					self.callExternal( 'fileUploadAwaitingResponse', id, self.getFileInfoFromRef( ref));
+					
+					// start a response timeout timer
+					if( entry.responseTimeout !==null) {
+						var t:Timer =new Timer( entry.responseTimeout *1000, 1);
+						
+						// create event listener to act accordingly on timeout
+						t.addEventListener( TimerEvent.TIMER_COMPLETE, function(){
+							Debug.write( '[EVENT] file - TimerEvent.TIMER_COMPLETE (response timeout)');
+							
+							// stop uploading process
+							ref.cancel();
+							
+							// notify of error
+							uploadErrorFn( 'Response awaiting timeout');
+							uploadCompleteFn( false);
+						});
+						
+						// assign timer to entry
+						entry.timeoutTimer =t;
+						
+						// start timer
+						t.start();
+					}
 				}
 			});
 			ref.addEventListener( DataEvent.UPLOAD_COMPLETE_DATA, function( e:DataEvent){
@@ -435,7 +548,7 @@ package {
 		}
 		
 		// start uploading specified file in queue
-		public function startUpload( i:*, url:String, fileName:String, postVars =null, expectResponse =true, responseTimeout =null):Boolean {
+		public function startUpload( i:*, url:String, fileName:String, postVars =null, uploadTimeout =null, expectResponse =true, responseTimeout =null):Boolean {
 			Debug.write( 'FileUploader::startUpload()');
 			
 			if( postVars ===null)
@@ -488,6 +601,9 @@ package {
 			
 			// reference file reference object
 			var file:FileReference =entry.ref;
+			
+			// uploading timeout
+			entry.uploadTimeout =uploadTimeout;
 			
 			// assign response expectation flag
 			entry.expectResponse =expectResponse;

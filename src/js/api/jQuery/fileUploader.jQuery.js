@@ -82,6 +82,24 @@ with( fileUploader.Uploader.prototype) {
     });
   };
   
+  // handle file uploading transfer rate
+  onUploadTransferRate =function( id, fileInfo, speed, avgSpeed) {
+    $(this.elem).trigger( 'uploadTransferRate', {
+      'fileId': id,
+      'fileInfo': fileInfo,
+      'speed': speed,
+      'avgSpeed': avgSpeed
+    });
+  };
+  
+  // handle file uploading completion, enter server response awaiting state
+  onUploadAwaitingResponse =function( id, fileInfo) {
+    $(this.elem).trigger( 'uploadWaitResponse', {
+      'fileId': id,
+      'fileInfo': fileInfo
+    });
+  };
+  
   // handle file uploading error
   onUploadError =function( id, fileInfo, errorMsg) {
     $(this.elem).trigger( 'uploadError', {

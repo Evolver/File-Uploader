@@ -130,6 +130,16 @@ flash.handlers.fileUploadProgress =function( fileId, fileInfo, bytesLoaded, byte
   return api.handlers.fileUploadProgress( fileId, fileInfo, bytesLoaded, bytesTotal, percComplete);
 };
 
+// file transfer rate info
+flash.handlers.fileUploadTransferRate =function( fileId, fileInfo, speed, avgSpeed) {
+  return api.handlers.fileUploadTransferRate( fileId, fileInfo, speed, avgSpeed);
+};
+
+// file upload has been completed, awaiting server response
+flash.handlers.fileUploadAwaitingResponse =function( fileId, fileInfo) {
+  return api.handlers.fileUploadAwaitingResponse( fileId, fileInfo);
+};
+
 // file upload error encountered
 flash.handlers.fileUploadError =function( fileId, fileInfo, errorMsg) {
   return api.handlers.fileUploadError( fileId, fileInfo, errorMsg);
@@ -191,17 +201,19 @@ api.call.getQueueSize =flash.call.getQueueSize =function( buttonId) {
 };
 
 // start file uploading
-api.call.startUpload =flash.call.startUpload =function( fileId, url, fileName, postArgs, expectResponse, responseTimeout) {
+api.call.startUpload =flash.call.startUpload =function( fileId, url, fileName, postArgs, uploadTimeout, expectResponse, responseTimeout) {
   if( !api.ready)
     throw 'File uploader is not ready';
    
   // make sure all params are passed
+  if( uploadTimeout ===undefined)
+    uploadTimeout =null;
   if( expectResponse ===undefined)
     expectResponse =true;
   if( responseTimeout ===undefined)
     responseTimeout =10;
     
-  movie.startUpload( fileId, url, fileName, postArgs, expectResponse, responseTimeout);
+  movie.startUpload( fileId, url, fileName, postArgs, uploadTimeout, expectResponse, responseTimeout);
 };
 
 // stop file uploading
@@ -278,6 +290,12 @@ api.bridge =function( elementId, methodName, args) {
     break;
     case 'fileUploadProgress':
       return flash.handlers.fileUploadProgress( args[0], args[1], args[2], args[3], args[4]);
+    break;
+    case 'fileUploadTransferRate':
+      return flash.handlers.fileUploadTransferRate( args[0], args[1], args[2], args[3]);
+    break;
+    case 'fileUploadAwaitingResponse':
+      return flash.handlers.fileUploadAwaitingResponse( args[0], args[1]);
     break;
     case 'fileUploadError':
       return flash.handlers.fileUploadError( args[0], args[1], args[2]);
@@ -763,6 +781,16 @@ api.handlers.fileUploadProgress =function( fileId, fileInfo, bytesLoaded, bytesT
   api.debug( '[FLASH] fileUploadProgress - file=' +fileId +', name=' +fileInfo.name +', bytes=' +bytesLoaded +'/' +bytesTotal +' (' +percComplete +'%)');
 };
 
+// file upload transfer rate
+api.handlers.fileUploadTransferRate =function( fileId, fileInfo, speed, avgSpeed) {
+  api.debug( '[FLASH] fileUploadTransferRate - file=' +fileId +', name=' +fileInfo.name +', speed=' +speed +', average=' +avgSpeed);
+};
+
+// file upload has been completed, awaiting server response
+api.handlers.fileUploadAwaitingResponse =function( fileId, fileInfo) {
+  api.debug( '[FLASH] fileUploadAwaitingResponse - file=' +fileId +', name=' +fileInfo.name);
+};
+
 // file upload error encountered
 api.handlers.fileUploadError =function( fileId, fileInfo, errorMsg) {
   api.debug( '[FLASH] fileUploadError - file=' +fileId +', name=' +fileInfo.name);
@@ -776,6 +804,24 @@ api.handlers.fileUploadSuccess =function( fileId, fileInfo, serverData, filesRem
 // file upload has completed
 api.handlers.fileUploadComplete =function( fileId, fileInfo, queueSize, removeFromQueue) {
   api.debug( '[FLASH] fileUploadComplete - file=' +fileId +', name=' +fileInfo.name +', removeFromQueue=' +removeFromQueue);
+};
+
+// custom public functions
+
+// get readable data volume representation
+api.readableVolume =function( bytes) {
+  var levels =[ 'B', 'KB', 'MB', 'GB', 'TB'];
+  var level =0;
+  var maxLevel =levels.length -1;
+  var div =1024;
+  
+  while( bytes > div && level < maxLevel) {
+    level++;
+    bytes =bytes / div;
+  }
+  
+  // return readable representation
+  return bytes.toFixed( 2).toString() +' ' +levels[ level];
 };
   
 })( window, window, document, window.fileUploaderDependency, config.swfUrl);

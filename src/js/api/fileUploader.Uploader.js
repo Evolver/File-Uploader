@@ -79,7 +79,7 @@ function BeginOrContinueUploading( uploader) {
     file.state =api.Uploader.STATE_UPLOADING;
       
     // upload that file
-    fileUploader.call.startUpload( k, file.url, file.fileName, file.postArgs, file.expectResponse, uploader.timeout);
+    fileUploader.call.startUpload( k, file.url, file.fileName, file.postArgs, uploader.uploadTimeout, file.expectResponse, uploader.responseTimeout);
     
     // see if more files can be uploaded
     if( --uploadCount ==0)
@@ -212,6 +212,26 @@ fileUploader.handlers.fileUploadProgress =function( fileId, fileInfo, bytesLoade
   uploader.onUploadProgress( fileId, fileInfo, bytesLoaded, bytesTotal, percComplete);
 };
 
+// file upload transfer rate
+fileUploader.handlers.fileUploadTransferRate =function( fileId, fileInfo, speed, avgSpeed) {
+  api.debug( '[FLASH] fileUploadTransferRate - file=' +fileId +', name=' +fileInfo.name +', speed=' +speed +', average=' +avgSpeed);
+  
+  var uploader =GetObjectByButtonId( GetButtonIdByFileId( fileId));
+  
+  // execute callback
+  uploader.onUploadTransferRate( fileId, fileInfo, speed, avgSpeed);
+};
+
+// file upload has been finished, awaiting server response
+fileUploader.handlers.fileUploadAwaitingResponse =function( fileId, fileInfo) {
+  api.debug( '[FLASH] fileUploadAwaitingResponse - file=' +fileId +', name=' +fileInfo.name);
+  
+  var uploader =GetObjectByButtonId( GetButtonIdByFileId( fileId));
+  
+  // execute callback
+  uploader.onUploadAwaitingResponse( fileId, fileInfo);
+};
+
 // file upload error encountered
 fileUploader.handlers.fileUploadError =function( fileId, fileInfo, errorMsg) {
   api.debug( '[FLASH] fileUploadError - file=' +fileId +', name=' +fileInfo.name);
@@ -287,7 +307,10 @@ with( api.Uploader) {
   prototype.concurrency =2;
   
   // file uploading timeout
-  prototype.timeout =null;
+  prototype.uploadTimeout =null;
+  
+  // server response timeout
+  prototype.responseTimeout =null;
   
   // assigned at construction
   prototype.queue =null;
@@ -445,6 +468,16 @@ with( api.Uploader) {
   
   // handle file uploading progress
   prototype.onUploadProgress =function( id, fileInfo, bytesLoaded, bytesTotal, percComplete) {
+    
+  };
+  
+  // handle file uploading transfer rate info
+  prototype.onUploadTransferRate =function( id, fileInfo, speed, avgSpeed) {
+    
+  };
+  
+  // handle file uploading completion, enter server response awaiting state
+  prototype.onUploadAwaitingResponse =function( id, fileInfo) {
     
   };
   

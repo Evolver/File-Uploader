@@ -37,7 +37,7 @@
     var $btn =$( '#myButton');
     
     // listen to events
-    $btn.bind( 'uploadDialogOpen uploadDialogClose uploadFileSelect uploadFileRemove uploadStart uploadProgress uploadSuccess uploadError uploadComplete', function( e, data){
+    $btn.bind( 'uploadDialogOpen uploadDialogClose uploadFileSelect uploadFileRemove uploadStart uploadProgress uploadTransferRate uploadWaitResponse uploadSuccess uploadError uploadComplete', function( e, data){
       switch( e.type) {
         case 'uploadDialogOpen':
           debug( 'Dialog open');
@@ -57,6 +57,12 @@
         case 'uploadProgress':
           debug( 'Upload progress #' +data.fileId +' - ' +data.fileInfo.name + ' (' +data.percComplete +'%)');
         break;
+        case 'uploadTransferRate':
+          debug( 'Upload transfer rate #' +data.fileId +' - ' +data.fileInfo.name + ', speed=' +fileUploader.readableVolume( data.speed) +'/s, avg=' +fileUploader.readableVolume( data.avgSpeed) +'/s');
+        break;
+        case 'uploadWaitResponse':
+          debug( 'Waiting for server response #' +data.fileId +' - ' +data.fileInfo.name);
+        break;
         case 'uploadSuccess':
           debug( 'Upload success #' +data.fileId +' - ' +data.fileInfo.name);
         break;
@@ -71,7 +77,8 @@
     
     // initialize uploader
     var uploaderObject =$btn.uploader({
-      'url': '/test/receive.php'
+      'url': '/test/receive.php',
+      'expectResponse': true
     });
     
     // optionally configure uploader instance
