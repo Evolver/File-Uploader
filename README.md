@@ -52,14 +52,14 @@ File Uploader consists of four elements you need to include in your webpage:
     Example:
     <pre>
         &lt;!-- dependent library and binding --&gt;
-        &lt;script type="text/javascript" src="jquery-1.3.2.js">&lt;/script&gt;
-        &lt;script type="text/javascript" src="fileUploader.dependency.jQuery.js">&lt;/script&gt;
+        &lt;script type="text/javascript" src="/src/js/dep/jQuery/jquery-1.3.2.js">&lt;/script&gt;
+        &lt;script type="text/javascript" src="/src/js/dep/jQuery/fileUploader.jQuery.js">&lt;/script&gt;
         
         &lt;!-- uploader core file --&gt;
-        &lt;script type="text/javascript" src="fileUploader.core.js">&lt;/script&gt;
+        &lt;script type="text/javascript" src="/src/js/fileUploader.core.js">&lt;/script&gt;
         
         &lt;!-- uploader public API --&gt;
-        &lt;script type="text/javascript" src="fileUploader.Uploader.js"&gt;&lt;/script&gt;
+        &lt;script type="text/javascript" src="/src/js/api/fileUploader.Uploader.js"&gt;&lt;/script&gt;
     </pre>
   </li>
 </ol>
@@ -67,6 +67,20 @@ File Uploader consists of four elements you need to include in your webpage:
 <h3>Step 3 - Use File Uploader</h3>
 
 <b>To use out of box API, use the following code:</b>
+
+<pre>
+  &lt;!-- dependent library and binding --&gt;
+  &lt;script type="text/javascript" src="/src/js/dep/jQuery/jquery-1.3.2.js">&lt;/script&gt;
+  &lt;script type="text/javascript" src="/src/js/dep/jQuery/fileUploader.jQuery.js">&lt;/script&gt;
+  
+  &lt;!-- uploader core file --&gt;
+  &lt;script type="text/javascript" src="/src/js/fileUploader.core.js">&lt;/script&gt;
+  
+  &lt;!-- uploader public API --&gt;
+  &lt;script type="text/javascript" src="/src/js/api/fileUploader.Uploader.js"&gt;&lt;/script&gt;
+</pre>
+
+...
 
 <pre>
   // instantiate uploader
@@ -135,7 +149,24 @@ File Uploader consists of four elements you need to include in your webpage:
   uploader.attach( document.getElementById( 'myButton'));
 </pre>
 
-<b>As of today (13.12.2009) jQuery API is available:</b>
+<b>jQuery API:</b>
+
+<pre>
+  &lt;!-- dependent library and binding --&gt;
+  &lt;script type="text/javascript" src="/src/js/dep/jQuery/jquery-1.3.2.js">&lt;/script&gt;
+  &lt;script type="text/javascript" src="/src/js/dep/jQuery/fileUploader.jQuery.js">&lt;/script&gt;
+  
+  &lt;!-- uploader core file --&gt;
+  &lt;script type="text/javascript" src="/src/js/fileUploader.core.js">&lt;/script&gt;
+  
+  &lt;!-- uploader public API --&gt;
+  &lt;script type="text/javascript" src="/src/js/api/fileUploader.Uploader.js"&gt;&lt;/script&gt;
+  
+  &lt;!-- jQuery public API binding --&gt;
+  &lt;script type="text/javascript" src="/src/js/api/jQuery/fileUploader.jQuery.js"&gt;&lt;/script&gt;
+</pre>
+
+...
 
 <pre>
   // jQuery-wrapped #myButton
