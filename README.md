@@ -33,8 +33,8 @@ File Uploader is a flash-based file uploader, alternative to SWFUpload. It is ro
 
 <h3>Step 1 - Make a File Uploader bundle you need</h3>
 
-Right now File Uploader consists of multiple JavaScript (<b>*.js</b>) source code files. It's because of File Uploader's modular design, which allows to use File Uploader with any library's (like jQuery or Prototype.js) native API.
-In the future, File Uploader will be shipped in packages meant to be used with specific JavaScript library (for example - jQuery package, Prototype.js package and so on). When <b>File Uploader packaging will come true</b>, you will have to include <b>single *.js file in your webpage</b> to use File Uploader.
+<i>Right now File Uploader consists of multiple JavaScript (<b>*.js</b>) source code files. It's because of File Uploader's modular design, which allows to use File Uploader with any library's (like jQuery or Prototype.js) native API.
+In the future, File Uploader will be shipped in packages meant to be used with specific JavaScript library (for example - jQuery package, Prototype.js package and so on). When <b>File Uploader packaging will come true</b>, you will have to include <b>single *.js file in your webpage</b> to use File Uploader.</i>
 
 But now, while File Uploader packages are yet to be implemented, to use File Uploader you have include four separate File Uploader source code parts in your webpage:
 
