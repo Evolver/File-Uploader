@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru" dir="ltr">
+<head>
+  <title>jQuery-based uploader testing</title>
+  <script type="text/javascript" src="/src/js/dep/jQuery/jquery-1.3.2.js"></script>
+  <script type="text/javascript" src="/src/js/dep/jQuery/fileUploader.dependency.jQuery.js"></script>
+  <script type="text/javascript" src="/src/js/fileUploader.core.js"></script>
+  <script type="text/javascript" src="/src/js/api/fileUploader.Uploader.js"></script>
+  <script type="text/javascript" src="/src/js/api/jQuery/fileUploader.jQuery.js"></script>
+  <link rel="stylesheet" href="style.css" />
+  
+</head>
+<body>
+  
+  <div id="myButton">
+    My button
+  </div>
+  
+  <div id="debug">
+  
+  </div>
+
+  <script type="text/javascript">
+    function debug( msg) {
+      $('#debug').append( msg +'<br />');  
+    }
+    
+    debug( '<b>Debug info:</b>');
+    
+    // jQuery-wrapped #myButton
+    var $btn =$( '#myButton');
+    
+    // listen to events
+    $btn.bind( 'uploadDialogOpen uploadDialogClose uploadFileSelect uploadFileRemove uploadStart uploadProgress uploadSuccess uploadError uploadComplete', function( e, data){
+      switch( e.type) {
+        case 'uploadDialogOpen':
+          debug( 'Dialog open');
+        break;
+        case 'uploadDialogClose':
+          debug( 'Dialog close');
+        break;
+        case 'uploadFileSelect':
+          debug( 'Select file #' +data.fileId +' - ' +data.fileInfo.name + ' (size=' +data.fileInfo.size +')');
+        break;
+        case 'uploadFileRemove':
+          debug( 'Remove file #' +data.fileId +' - ' +data.fileInfo.name);
+        break;
+        case 'uploadStart':
+          debug( 'Start upload #' +data.fileId +' - ' +data.fileInfo.name);
+        break;
+        case 'uploadProgress':
+          debug( 'Upload progress #' +data.fileId +' - ' +data.fileInfo.name + ' (' +data.percComplete +'%)');
+        break;
+        case 'uploadSuccess':
+          debug( 'Upload success #' +data.fileId +' - ' +data.fileInfo.name);
+        break;
+        case 'uploadError':
+          debug( 'Upload error #' +data.fileId +' - ' +data.fileInfo.name +' (' +data.errorMsg +')');
+        break;
+        case 'uploadComplete':
+          debug( 'Upload complete #' +data.fileId +' - ' +data.fileInfo.name);
+        break;
+      }
+    });
+    
+    // initialize uploader
+    var uploaderObject =$btn.uploader({
+      'url': '/test/receive.php'
+    });
+    
+    // optionally configure uploader instance
+    //uploaderObject.concurrency =2;
+    
+    // detach uploader from a button
+    //uploaderObject.detach();
+  </script>
+  
+
+</body>
+</html>

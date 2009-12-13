@@ -23,7 +23,7 @@
 
 var config ={
   // flash file URL
-  'swfUrl': 'FileUploader.swf'
+  'swfUrl': '/bin/flash/FileUploader.swf'
 };
 
 (function( api, window, document, dependency, swfUrl){

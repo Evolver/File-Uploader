@@ -92,10 +92,10 @@ function CheckUploadData( uploadData) {
   // check if required fields are present
   if( uploadData.url ===undefined)
     throw 'url is not defined';
-  if( uploadData.fileName ===undefined)
-    throw 'fileName is not defined';
     
   // check if optional fields are present
+  if( uploadData.fileName ===undefined)
+    uploadData.fileName ='file';
   if( uploadData.postArgs ===undefined)
     uploadData.postArgs ={};
   if( uploadData.expectResponse ===undefined)
@@ -133,11 +133,12 @@ fileUploader.handlers.fileSelect =function( buttonId, fileId, fileInfo) {
   
   var uploader =GetObjectByButtonId( buttonId);
   
-  // execute callback and get submission data
+  // get custom upload data
   var uploadData =uploader.onSelect( fileId, fileInfo);
   
-  // see if something was returned from onSelect handler
-  if( false && uploadData !==undefined) {
+    // see if upload data was set during event handling
+  if(  uploadData !==undefined && uploadData !==null) {
+    // check upload data
     CheckUploadData( uploadData);
     
   } else {
@@ -278,7 +279,7 @@ with( api.Uploader) {
   // assigned at construction
   prototype.queue =null;
   
-  // assigned at construction
+  // default upload data : assigned at construction
   prototype.uploadData =null;
   
   // start uploading automatically
@@ -417,7 +418,7 @@ with( api.Uploader) {
   };
   
   // handle file uploading success
-  prototype.onUploadSuccess =function( id, fileInfo, serverData, filesPending) {
+  prototype.onUploadSuccess =function( id, fileInfo, serverData, filesRemaining) {
     
   };
   

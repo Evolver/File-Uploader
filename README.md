@@ -1,7 +1,7 @@
 
 <h1>File Uploader</h1>
 
-File Uploader is a flash-based file uploader, alternative to SWFUpload. It is robust, fast and easy to use.
+File Uploader is a flash-based file uploader, alternative to SWFUpload. It is robust, fast and easy to use. It is meant to be used on a web pages to replace standard &lt;input type="file" /&gt;.
 
 <b style="color:red;">File Uploader is under development and it's implementation is experimental. No stable release is currently available.</b>
 
@@ -17,6 +17,16 @@ File Uploader is a flash-based file uploader, alternative to SWFUpload. It is ro
   <li>Supports automatic upload start</li>
   <li>Designed to support any JavaScript library</li>
   <li>Licensed under <a href="http://www.gnu.org/licenses/gpl-2.0.html">GPL v2</a></li>
+</ul>
+
+<h2>With File Uploader you can:</h2>
+
+<ul>
+  <li>Select multiple files for uploading</li>
+  <li>Upload selected files asynchronously (without submitting the form, just like AJAX works)</li>
+  <li>Display upload progress bars or other upload status indicators</li>
+  <li>Get file name, size and type, remove unnecessary files from queue before actual upload starts</li>
+  <li>Upload files to different URLs concurrently</li>
 </ul>
 
 <h2>Installation and usage</h2>
@@ -55,6 +65,8 @@ File Uploader consists of four elements you need to include in your webpage:
 </ol>
 
 <h3>Step 3 - Use File Uploader</h3>
+
+<b>To use out of box API, use the following code:</b>
 
 <pre>
   // instantiate uploader
@@ -123,9 +135,61 @@ File Uploader consists of four elements you need to include in your webpage:
   uploader.attach( document.getElementById( 'myButton'));
 </pre>
 
+<b>As of today (13.12.2009) jQuery API is available:</b>
+
+<pre>
+  // jQuery-wrapped #myButton
+  var $btn =$( '#myButton');
+  
+  // listen to events
+  $btn.bind( 'uploadDialogOpen uploadDialogClose uploadFileSelect uploadFileRemove uploadStart uploadProgress uploadSuccess uploadError uploadComplete', function( e, data){
+    switch( e.type) {
+      case 'uploadDialogOpen':
+        debug( 'Dialog open');
+      break;
+      case 'uploadDialogClose':
+        debug( 'Dialog close');
+      break;
+      case 'uploadFileSelect':
+        debug( 'Select file #' +data.fileId +' - ' +data.fileInfo.name + ' (size=' +data.fileInfo.size +')');
+      break;
+      case 'uploadFileRemove':
+        debug( 'Remove file #' +data.fileId +' - ' +data.fileInfo.name);
+      break;
+      case 'uploadStart':
+        debug( 'Start upload #' +data.fileId +' - ' +data.fileInfo.name);
+      break;
+      case 'uploadProgress':
+        debug( 'Upload progress #' +data.fileId +' - ' +data.fileInfo.name + ' (' +data.percComplete +'%)');
+      break;
+      case 'uploadSuccess':
+        debug( 'Upload success #' +data.fileId +' - ' +data.fileInfo.name);
+      break;
+      case 'uploadError':
+        debug( 'Upload error #' +data.fileId +' - ' +data.fileInfo.name +' (' +data.errorMsg +')');
+      break;
+      case 'uploadComplete':
+        debug( 'Upload complete #' +data.fileId +' - ' +data.fileInfo.name);
+      break;
+    }
+  });
+  
+  // initialize uploader
+  var uploaderObject =$btn.uploader({
+    'url': '/test/receive.php'
+  });
+  
+  // optionally configure uploader instance
+  //uploaderObject.concurrency =2;
+  
+  // detach uploader from a button
+  //uploaderObject.detach();
+</pre>
+
 <h3>Examples</h3>
 
-You can view live debugging test <a href="http://www.stepanov.lv/uploader/test.html">here</a>.
+You can view live debugging test of native API <a href="http://www.stepanov.lv/uploader/test.html">here</a>.
+Other tests you can find in /test/ directory of File-Uploader repo.
 
 <h2>Supported browsers</h2>
 
