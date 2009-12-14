@@ -237,8 +237,9 @@ Note: currently only jQuery library API is supported.
 
 <h3>Examples</h3>
 
-You can view live debugging preview of native API <a href="http://www.stepanov.lv/uploader/test.html">here</a> (Soon to be removed).
-Other tests you can find in <b>/test/</b> directory of File-Uploader repo. If you have cloned repo and trying to view tests from your local hard drive, the tests won't work because of Flash's security features. You have to upload tests to a web host and access them via browser to see File Uploader in action.
+You can view live debugging preview of native API <a href="http://www.stepanov.lv/uploader/test/native.html">here</a>. jQuery version of File Uploader debug preview can be found <a href="http://www.stepanov.lv/uploader/test/jQuery.html">here</a>.
+
+If you have cloned repo and trying to view tests from your local hard drive, the tests won't work because of Flash's security features. You have to upload tests to a web host and access them via browser to see File Uploader in action.
 
 <h2>Supported browsers</h2>
 

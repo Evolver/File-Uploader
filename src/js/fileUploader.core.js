@@ -21,7 +21,7 @@
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
   */
 
-(function( api, window, document, dependency, swfUrl){
+(function( api, window, document, dependency){
 
 var undefined;
 
@@ -644,9 +644,9 @@ api.load =function() {
     BUGFIX: In IE "data" attribute is being added.
   */
   var html =
-    '<object id="fileUploader_OBJECT" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" width="1px" height="1px"' +( /* BUGFIX */ dependency.isAgentIE() ? ' data="' +swfUrl +'"' :'') +'>' +
+    '<object id="fileUploader_OBJECT" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" width="1px" height="1px"' +( /* BUGFIX */ dependency.isAgentIE() ? ' data="' +config.swfUrl +'"' :'') +'>' +
     	'<param name="allowScriptAccess" value="always" />' +
-    	'<param name="movie" value="' +swfUrl +'" />' +
+    	'<param name="movie" value="' +config.swfUrl +'" />' +
     	'<param name="wmode" value="transparent" />' +
     	'<param name="menu" value="false" />' +
     	'<param name="quality" value="low" />' +
@@ -654,7 +654,7 @@ api.load =function() {
     	'<param name="play" value="false" />' +
     	'<param name="loop" value="false" />' +
     	'<param name="flashvars" value="elementId=fileUploader_OBJECT&amp;bridgeFn=fileUploader.bridge&amp;debugFn=fileUploader.debug&amp;visualDebug=' +(api.visualDebug ? '1' : '0') +'" />' +
-    	'<embed id="fileUploader_EMBED" src="' +swfUrl +'" flashvars="elementId=fileUploader_EMBED&amp;bridgeFn=fileUploader.bridge&amp;debugFn=fileUploader.debug&amp;visualDebug=' +(api.visualDebug ? '1' : '0') +'" width="1px" height="1px" allowScriptAccess="always" type="application/x-shockwave-flash" pluginspage="http://www.adobe.com/go/getflashplayer" wmode="transparent" menu="false" quality="low" scale="exactfit" play="false" loop="false" />' +
+    	'<embed id="fileUploader_EMBED" src="' +config.swfUrl +'" flashvars="elementId=fileUploader_EMBED&amp;bridgeFn=fileUploader.bridge&amp;debugFn=fileUploader.debug&amp;visualDebug=' +(api.visualDebug ? '1' : '0') +'" width="1px" height="1px" allowScriptAccess="always" type="application/x-shockwave-flash" pluginspage="http://www.adobe.com/go/getflashplayer" wmode="transparent" menu="false" quality="low" scale="exactfit" play="false" loop="false" />' +
     '</object>';
   
   // create container element
@@ -825,7 +825,7 @@ api.readableVolume =function( bytes) {
   return bytes.toFixed( 2).toString() +' ' +levels[ level];
 };
   
-})( window, window, document, window.fileUploaderDependency, config.swfUrl);
+})( window, window, document, window.fileUploaderDependency);
 
 // cleanup
 delete config;
