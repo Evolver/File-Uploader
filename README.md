@@ -36,10 +36,7 @@ File Uploader is a flash-based file uploader, alternative to SWFUpload. It is ro
 
 <h3>Step 1 - Make a File Uploader bundle you need</h3>
 
-<i>Right now File Uploader consists of multiple JavaScript (<b>*.js</b>) source code files. It's because of File Uploader's modular design, which allows to use File Uploader with any library's (like jQuery or Prototype.js) native API.
-In the future, File Uploader will be shipped in packages meant to be used with specific JavaScript library (for example - jQuery package, Prototype.js package and so on). When <b>File Uploader packaging will come true</b>, you will have to include <b>single *.js file in your webpage</b> to use File Uploader.</i>
-
-But now, while File Uploader packages are yet to be implemented, to use File Uploader you have include four separate File Uploader source code parts in your webpage:
+To use File Uploader you have include four separate File Uploader source code parts in your webpage:
 
 <ol>
   <li>Dependent library (such as jQuery, Prototype.js or something else) and it's binding for FileUploader [located in <b>src/js/dep/</b>]</li>
@@ -47,6 +44,12 @@ But now, while File Uploader packages are yet to be implemented, to use File Upl
   <li>File Uploader public API file (API you will use to work with uploader) [located in <b>src/js/api/</b>]</li>
   <li>File Uploader SWF file [<b>bin/flash/FileUploader.swf</b>]</li>
 </ol>
+
+Or you can use a File Uploader bundle building tool <b>build/build.php</b>. Use this script from command line by running php.<br />
+Usage:   <i>php build.php &lt;<b>source directory</b>&gt; &lt;<b>dependent library name</b>&gt; &lt;<b>output file name</b>&gt;</i><br />
+Example: php build.php "C:\repo\File-Uploader" jQuery "fileUploader.jQuery.js"<br /><br />
+
+Note: currently only jQuery API is supported.
 
 <h3>Step 2 - Deploy File Uploader on your webserver</h3>
 
@@ -89,6 +92,10 @@ But now, while File Uploader packages are yet to be implemented, to use File Upl
 ...
 
 <pre>
+  // Specify where your flash file (FileUploader.swf) resides.
+  // This should be done once before any instantiation of fileUploader.Uploader object.
+  fileUploader.config.swfUrl ='/flash/FileUploader.swf';
+  
   // instantiate uploader
   var uploader =new fileUploader.Uploader({
     // url where to upload the file
@@ -175,6 +182,10 @@ But now, while File Uploader packages are yet to be implemented, to use File Upl
 ...
 
 <pre>
+  // Specify where your flash file (FileUploader.swf) resides.
+  // This should be done once before any instantiation of fileUploader.Uploader object.
+  fileUploader.config.swfUrl ='/flash/FileUploader.swf';
+  
   // jQuery-wrapped #myButton
   var $btn =$( '#myButton');
   
