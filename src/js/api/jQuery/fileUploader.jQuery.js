@@ -29,7 +29,7 @@ var undefined;
 // handle dialog open
 with( fileUploader.Uploader.prototype) {
   onDialogOpen =function() {
-    $(this.elem).trigger( 'uploadDialogOpen');
+    $(this.elem).triggerHandler( 'uploadDialogOpen');
   };
   
   // handle file selection
@@ -40,7 +40,7 @@ with( fileUploader.Uploader.prototype) {
     };
     
     // trigger callback
-    $(this.elem).trigger( 'uploadFileSelect', {
+    $(this.elem).triggerHandler( 'uploadFileSelect', {
       'fileId': id,
       'fileInfo': fileInfo,
       'returnData': returnData
@@ -52,7 +52,7 @@ with( fileUploader.Uploader.prototype) {
   
   // handle file removal
   onRemove =function( id, fileInfo) {
-    $(this.elem).trigger( 'uploadFileRemove', {
+    $(this.elem).triggerHandler( 'uploadFileRemove', {
       'fileId': id,
       'fileInfo': fileInfo
     });
@@ -60,12 +60,12 @@ with( fileUploader.Uploader.prototype) {
   
   // handle dialog closure
   onDialogClose =function() {
-    $(this.elem).trigger( 'uploadDialogClose');
+    $(this.elem).triggerHandler( 'uploadDialogClose');
   };
   
   // handle file uploading start
   onUploadStart =function( id, fileInfo) {
-    $(this.elem).trigger( 'uploadStart', {
+    $(this.elem).triggerHandler( 'uploadStart', {
       'fileId': id,
       'fileInfo': fileInfo
     });
@@ -73,7 +73,7 @@ with( fileUploader.Uploader.prototype) {
   
   // handle file uploading progress
   onUploadProgress =function( id, fileInfo, bytesLoaded, bytesTotal, percComplete) {
-    $(this.elem).trigger( 'uploadProgress', {
+    $(this.elem).triggerHandler( 'uploadProgress', {
       'fileId': id,
       'fileInfo': fileInfo,
       'bytesLoaded': bytesLoaded,
@@ -84,7 +84,7 @@ with( fileUploader.Uploader.prototype) {
   
   // handle file uploading transfer rate
   onUploadTransferRate =function( id, fileInfo, speed, avgSpeed) {
-    $(this.elem).trigger( 'uploadTransferRate', {
+    $(this.elem).triggerHandler( 'uploadTransferRate', {
       'fileId': id,
       'fileInfo': fileInfo,
       'speed': speed,
@@ -94,7 +94,7 @@ with( fileUploader.Uploader.prototype) {
   
   // handle file uploading completion, enter server response awaiting state
   onUploadAwaitingResponse =function( id, fileInfo) {
-    $(this.elem).trigger( 'uploadWaitResponse', {
+    $(this.elem).triggerHandler( 'uploadWaitResponse', {
       'fileId': id,
       'fileInfo': fileInfo
     });
@@ -102,7 +102,7 @@ with( fileUploader.Uploader.prototype) {
   
   // handle file uploading error
   onUploadError =function( id, fileInfo, errorMsg) {
-    $(this.elem).trigger( 'uploadError', {
+    $(this.elem).triggerHandler( 'uploadError', {
       'fileId': id,
       'fileInfo': fileInfo,
       'errorMsg': errorMsg
@@ -111,7 +111,7 @@ with( fileUploader.Uploader.prototype) {
   
   // handle file uploading success
   onUploadSuccess =function( id, fileInfo, serverData, filesRemaining) {
-    $(this.elem).trigger( 'uploadSuccess', {
+    $(this.elem).triggerHandler( 'uploadSuccess', {
       'fileId': id,
       'fileInfo': fileInfo,
       'filesRemaining': filesRemaining
@@ -120,7 +120,7 @@ with( fileUploader.Uploader.prototype) {
   
   // handle file uploading completion
   onUploadComplete =function( id, fileInfo, filesPending, removeFromQueue) {
-    $(this.elem).trigger( 'uploadComplete', {
+    $(this.elem).triggerHandler( 'uploadComplete', {
       'fileId': id,
       'fileInfo': fileInfo,
       'filesPending': filesPending,
