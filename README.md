@@ -46,10 +46,11 @@ To use File Uploader you have include four separate File Uploader source code pa
 </ol>
 
 Or you can use a File Uploader bundle building tool <b>build/build.php</b>. Use this script from command line by running php.<br />
-Usage:   <i>php build.php &lt;<b>source directory</b>&gt; &lt;<b>dependent library name</b>&gt; &lt;<b>output file name</b>&gt;</i><br />
-Example: php build.php "C:\repo\File-Uploader" jQuery "fileUploader.jQuery.js"<br /><br />
 
-Note: currently only jQuery API is supported.
+Usage:   <i>php build.php &lt;<b>source directory</b>&gt; &lt;<b>dependent library name</b>&gt; &lt;<b>output file name</b>&gt;</i><br />
+Example: php build.php "C:\repo\File-Uploader" jQuery "fileUploader.jQuery.js"<br />
+
+Note: currently only jQuery library API is supported.
 
 <h3>Step 2 - Deploy File Uploader on your webserver</h3>
 
