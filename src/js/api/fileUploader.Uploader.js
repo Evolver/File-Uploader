@@ -100,6 +100,8 @@ function CheckUploadData( uploadData) {
     uploadData.postArgs ={};
   if( uploadData.expectResponse ===undefined)
     uploadData.expectResponse =false;
+  if( uploadData.responseType ===undefined)
+    uploadData.responseType =api.RESPONSE_RAW;
 };
   
 // file dialog is opened
@@ -163,7 +165,8 @@ fileUploader.handlers.fileSelect =function( buttonId, fileId, fileInfo) {
     'url': uploadData.url,
     'fileName': uploadData.fileName,
     'postArgs': uploadData.postArgs,
-    'expectResponse': uploadData.expectResponse
+    'expectResponse': uploadData.expectResponse,
+    'responseType': uploadData.responseType
   };
   
   // associate file with button
@@ -248,6 +251,25 @@ fileUploader.handlers.fileUploadSuccess =function( fileId, fileInfo, serverData,
   
   var uploader =GetObjectByButtonId( GetButtonIdByFileId( fileId));
   
+  // get file entry by file id
+  var file =uploader.queue[ fileId];
+  
+  // see if expected response from server
+  if( file.expectResponse) {
+    // see what kind of response expecting
+    if( file.responseType ===api.RESPONSE_JSON) {
+      // JSON
+      try {
+        // eval
+        serverData =eval( 'return ' +serverData);
+        
+      } catch( e) {
+        // failed to parse JSON
+        throw 'Failed to parse JSON response from server (' +e.toString +')';
+      }
+    }
+  }
+  
   // execute callback
   uploader.onUploadSuccess( fileId, fileInfo, serverData, filesRemaining);
 };
@@ -273,6 +295,10 @@ fileUploader.handlers.fileUploadComplete =function( fileId, fileInfo, queueSize,
 };
   
 // expose API
+
+// export response types
+api.RESPONSE_JSON =0;
+api.RESPONSE_RAW =1;
 
 // constructor
 api.Uploader =function( defaultUploadData){
