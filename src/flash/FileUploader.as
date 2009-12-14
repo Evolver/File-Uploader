@@ -268,8 +268,7 @@ package {
 						ref.cancel();
 						
 						// notify of error
-						uploadErrorFn( 'Uploading timeout');
-						uploadCompleteFn( false);
+						uploadCompleteFn( uploadErrorFn( 'Uploading timeout'));
 					});
 					
 					// assign current timer
@@ -413,8 +412,7 @@ package {
 							ref.cancel();
 							
 							// notify of error
-							uploadErrorFn( 'Response awaiting timeout');
-							uploadCompleteFn( false);
+							uploadCompleteFn( uploadErrorFn( 'Response awaiting timeout'));
 						});
 						
 						// assign timer to entry
@@ -441,21 +439,29 @@ package {
 			});
 			
 			// uploading error
-			var uploadErrorFn:Function =function( msg:String){
-				self.callExternal( 'fileUploadError', id, self.getFileInfoFromRef( ref), msg);
+			var uploadErrorFn:Function =function( msg:String):Boolean {
+				// function returns status whether the file should be kept in queue
+				// or removed from queue
+				
+				// notify of file uploading error and return file status after error (should it be kept
+				// in queue, or should be removed from queue)
+				return !Boolean( self.callExternal( 'fileUploadError', id, self.getFileInfoFromRef( ref), msg));
 			};
 			
 			ref.addEventListener( SecurityErrorEvent.SECURITY_ERROR, function( e:SecurityErrorEvent){
 				Debug.write( '[EVENT] file - SecurityErrorEvent.SECURITY_ERROR');
 				
-				uploadErrorFn( 'Security violation: ' +e.text);
-				uploadCompleteFn( false);
+				uploadCompleteFn( uploadErrorFn( 'Security violation: ' +e.text));
 			});
 			ref.addEventListener( IOErrorEvent.IO_ERROR, function( e:IOErrorEvent){
 				Debug.write( '[EVENT] file - IOErrorEvent.IO_ERROR');
 				
-				uploadErrorFn( 'I/O error: ' +e.text);
-				uploadCompleteFn( false);
+				uploadCompleteFn( uploadErrorFn( 'I/O error: ' +e.text));
+			});
+			ref.addEventListener( HTTPStatusEvent.HTTP_STATUS, function( e:HTTPStatusEvent){
+				Debug.write( '[EVENT] file - HTTPStatusEvent.HTTP_STATUS');
+				
+				uploadCompleteFn( uploadErrorFn( 'HTTP status error: ' +e.status));
 			});
 		}
 		

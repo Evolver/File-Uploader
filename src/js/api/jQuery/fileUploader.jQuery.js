@@ -114,6 +114,7 @@ with( fileUploader.Uploader.prototype) {
     $(this.elem).triggerHandler( 'uploadSuccess', {
       'fileId': id,
       'fileInfo': fileInfo,
+      'serverData': serverData,
       'filesRemaining': filesRemaining
     });
   };

@@ -243,6 +243,9 @@ fileUploader.handlers.fileUploadError =function( fileId, fileInfo, errorMsg) {
   
   // execute callback
   uploader.onUploadError( fileId, fileInfo, errorMsg);
+  
+  // return flag telling if there is need to keep file in queue
+  return uploader.keepFailedInQueue;
 };
 
 // file upload was successful
@@ -261,11 +264,14 @@ fileUploader.handlers.fileUploadSuccess =function( fileId, fileInfo, serverData,
       // JSON
       try {
         // eval
-        serverData =eval( 'return ' +serverData);
+        serverData =eval( '(' +serverData +')');
         
       } catch( e) {
         // failed to parse JSON
-        throw 'Failed to parse JSON response from server (' +e.toString +')';
+        api.debug( 'Server sent invalid JSON string, unable to eval');
+        
+        // reset serverData to null
+        serverData =null;
       }
     }
   }
@@ -336,7 +342,7 @@ with( api.Uploader) {
   prototype.uploadTimeout =null;
   
   // server response timeout
-  prototype.responseTimeout =null;
+  prototype.responseTimeout =10;
   
   // assigned at construction
   prototype.queue =null;
@@ -355,6 +361,9 @@ with( api.Uploader) {
   
   // allow selection of multiple files
   prototype.multi =true;
+  
+  // keep failed uploads in queue
+  prototype.keepFailedInQueue =false;
   
   // attach a button to element
   prototype.attach =function( elem){

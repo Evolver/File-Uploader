@@ -48,6 +48,26 @@ api.fileUploaderDependency.getElementOffset =function( elem) {
   return $(elem).offset();
 };
 
+// get element relative offset
+api.fileUploaderDependency.getElementRelativeOffset =function( elem) {
+  var $elem =$( elem);
+  var $offsetParent =$elem.offsetParent();
+  var offset =$elem.offset();
+  
+  if( $offsetParent.size() ==0)
+    // return absolute offset
+    return offset;
+    
+  var parentOffset =$offsetParent.offset();
+  
+  // get relative offset
+  offset.left =offset.left -parentOffset.left;
+  offset.top =offset.top -parentOffset.top;
+  
+  // return offset relative to positioned parent element
+  return offset;
+};
+
 // get element outer width
 api.fileUploaderDependency.getElementOuterWidth =function( elem) {
   return $(elem).outerWidth();

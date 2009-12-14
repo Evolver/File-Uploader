@@ -49,7 +49,9 @@ api =api.fileUploader ={};
 // expose configuration object
 var config =api.config ={
   // flash file URL
-  'swfUrl': '/bin/flash/FileUploader.swf'
+  'swfUrl': '/bin/flash/FileUploader.swf',
+  // zIndex to assign to flash file container
+  'zIndex': 9999
 };
 
 // read-only property to see if uploader is initialized for
@@ -357,6 +359,8 @@ api.create =function( elem, settings) {
     'overlay': div,
     'left': null,
     'top': null,
+    'absoluteLeft': null,
+    'absoluteTop': null,
     'width': null,
     'height': null,
     'focused': false,
@@ -462,6 +466,13 @@ function FocusButton( elem) {
   // move button away of viewport
   button.focused =true;
   
+  // adjust movie to button
+  AdjustMovieToButton( button);
+  
+  // set maximum z-index so that flash object is always on top
+  // of other elements (IE bug fix)
+  movieContainer.style.zIndex =config.zIndex;
+  
   // move button overlay off the viewport
   with( button.overlay.style) {
     left ='-100px';
@@ -469,13 +480,6 @@ function FocusButton( elem) {
     width ='1px';
     height ='1px';
   }
-  
-  // adjust movie to button
-  AdjustMovieToButton( button);
-  
-  // set maximum z-index so that flash object is always on top
-  // of other elements (IE bug fix)
-  movieContainer.style.zIndex =9999;
 };
 
 // get OBJECT and EMBED tags from within movieContainer
@@ -523,8 +527,8 @@ function AdjustMovieToButton( button, justFocused) {
   
   // assign new positioning
   with( movieContainer.style) {
-    left =button.left +'px';
-    top =button.top +'px';
+    left =button.absoluteLeft +'px';
+    top =button.absoluteTop +'px';
   }
   
   if( justFocused) {
@@ -533,7 +537,7 @@ function AdjustMovieToButton( button, justFocused) {
       'buttonId': button.settings.id,
       'multi': button.settings.multi,
       'fileFilter': button.settings.fileFilter,
-      'fileFilterName': button.settings.fileFilterName
+      'fileFilterName': button.settings.fileFilterName +' (' +button.settings.fileFilter +')'
     });
   }
 };
@@ -592,10 +596,11 @@ function ButtonFollow() {
     
     // get bounding rect
     var offset =dependency.getElementOffset( elem);
+    var relativeOffset =dependency.getElementRelativeOffset( elem);
     
     // determine current element position on the screen
-    var left =offset.left;
-    var top =offset.top;
+    var left =relativeOffset.left;
+    var top =relativeOffset.top;
 
     // get width and height
     var width =dependency.getElementOuterWidth( elem);
@@ -603,17 +608,23 @@ function ButtonFollow() {
     
     // see if positioning needs to be changed
     if( lastLeft ===null || lastLeft !=left || lastTop !==null || lastTop !=top || lastWidth ===null || lastWidth !=width || lastHeight ===null || lastHeight !=height) {
-      // adjust positioning of overlay so it is right over the button
-      with( overlay) {
-        style.left =left +'px';
-        style.top =top +'px';
-        style.width =width +'px';
-        style.height =height +'px';
+      
+      // adjust positioning only if button is not focused
+      if( !button.focused) {
+        // adjust positioning of overlay so it is right over the button
+        with( overlay) {
+          style.left =left +'px';
+          style.top =top +'px';
+          style.width =width +'px';
+          style.height =height +'px';
+        }
       }
 
       // remember new data
       button.left =left;
       button.top =top;
+      button.absoluteLeft =offset.left;
+      button.absoluteTop =offset.top;
       button.width =width;
       button.height =height;
 
@@ -670,8 +681,8 @@ api.load =function() {
   // browser optimizations initialize flash element instantly. When flash
   // will call 'ready' callback, the 'ready' callback with shift flash object
   // out of viewport.
-  div.style.left ='0px';
-  div.style.top ='0px';
+  div.style.left =document.documentElement.scrollLeft +'px';
+  div.style.top =document.documentElement.scrollTop +'px';
   // assign content html
   div.innerHTML =html;
   
@@ -683,6 +694,11 @@ api.load =function() {
 
     // loose button focus
     LooseButton();
+  });
+  
+  // capture all clicks on the target div, avoid event bubbling
+  dependency.bind( div, 'click', function(){
+    return false;
   });
 
   // remember movie container element
@@ -795,6 +811,9 @@ api.handlers.fileUploadAwaitingResponse =function( fileId, fileInfo) {
 // file upload error encountered
 api.handlers.fileUploadError =function( fileId, fileInfo, errorMsg) {
   api.debug( '[FLASH] fileUploadError - file=' +fileId +', name=' +fileInfo.name);
+  
+  // do not keep failed file in queue
+  return false;
 };
 
 // file upload was successful
