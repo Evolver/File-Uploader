@@ -255,4 +255,12 @@ File Uploader was tested and is working as expected in:
   <li>Opera 10.10</li>
 </ul>
 
+<h2>Issues</h2>
+
+There are number of issues existing, ofcourse, all related with Microsoft Internet Explorer:
+
+<ul>
+  <li>You have to always <b>preload fileUploader by calling fileUploader.load() during page load</b>. If you are using AJAX and instantiate first fileUploader.Uploader object during AJAX event, the uploader won't work. This is because of IE's security feature (i guess, or maybe another IE bug), which does not export ExternalInterface of Flash OBJECT to movie element when you inject OBJECT into DOM not during page load time.</li>
+</ul>
+
 More info to come...
