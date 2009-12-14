@@ -21,11 +21,6 @@
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
   */
 
-var config ={
-  // flash file URL
-  'swfUrl': '/bin/flash/FileUploader.swf'
-};
-
 (function( api, window, document, dependency, swfUrl){
 
 var undefined;
@@ -50,6 +45,12 @@ var buttonIdOffset =0;
 
 // expose API object
 api =api.fileUploader ={};
+
+// expose configuration object
+var config =api.config ={
+  // flash file URL
+  'swfUrl': '/bin/flash/FileUploader.swf'
+};
 
 // read-only property to see if uploader is initialized for
 // system calls
