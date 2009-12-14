@@ -92,11 +92,6 @@ flash.handlers.ready =function( elementId) {
       
   // set ready flag
   api.ready =true;
-      
-  // now when object is inserted and initialized,
-  // we move it out of viewport
-  movieContainer.style.left ='-100px';
-  movieContainer.style.top ='-100px';
   
   // in case we had focus on button while flash was
   // loading, restore that focus
@@ -314,12 +309,6 @@ api.bridge =function( elementId, methodName, args) {
 
 // create new button over element
 api.create =function( elem, settings) {
-  // see if file uploader is initialized
-  if( movieContainer ===null) {
-    // initialize file uploader
-    api.load();
-  }
-  
   // make sure settings object is instantiated
   if( settings ===undefined)
     settings ={};
@@ -345,9 +334,11 @@ api.create =function( elem, settings) {
   // when mouse is over this element, move flash object right over
   // the overlay
   dependency.bind( div, 'mouseenter', function() {
-    if( !api.ready)
-      // take no action while flash is not ready
-      return;
+    // see if file uploader is initialized
+    if( movieContainer ===null) {
+      // initialize file uploader
+      api.load();
+    }
     
     // focus target element
     FocusButton( elem);
@@ -468,7 +459,7 @@ function FocusButton( elem) {
   
   // adjust movie to button
   AdjustMovieToButton( button);
-  
+
   // set maximum z-index so that flash object is always on top
   // of other elements (IE bug fix)
   movieContainer.style.zIndex =config.zIndex;
@@ -554,23 +545,31 @@ function LooseButton() {
     }
   }
   
+  // find focused button and change it's focus status
+  for( var i =0; i < buttons.length; ++i) {
+    if( buttons[i].focused) {
+      // button has lost it's focus
+      buttons[i].focused =false;
+      // force repositioning
+      buttons[i].top =null;
+      buttons[i].left =null;
+    }
+  }
+  
   // assign initial settings
   movieContainer.style.width ='1px';
   movieContainer.style.height ='1px';
   movieContainer.style.left ='-100px';
   movieContainer.style.top ='-100px';
   
-  // find focused button and change it's focus status
-  for( var i =0; i < buttons.length; ++i) {
-    if( buttons[i].focused) {
-      // button has lost it's focus
-      buttons[i].focused =false;
-    }
-  }
-  
   // assign new button positions
   ButtonFollow();
 };
+
+// button follow routine, executed by event handlers and setTimeout
+function ButtonFollowRoutine() {
+  ButtonFollow();
+}
 
 // see which buttons are registered to the file uploader,
 // check if element positions / dimensions have changed,
@@ -585,6 +584,7 @@ function ButtonFollow( justReady) {
   var overlay;
   var elem;
   var style;
+  var focusedButton =null;
   for( var i =0; i < buttons.length; ++i) {
     button =buttons[i];
     
@@ -611,7 +611,14 @@ function ButtonFollow( justReady) {
     var height =dependency.getElementOuterHeight( elem);
     
     // see if positioning needs to be changed
-    if( lastLeft ===null || lastLeft !=left || lastTop !==null || lastTop !=top || lastWidth ===null || lastWidth !=width || lastHeight ===null || lastHeight !=height) {
+    if( justReady || lastLeft ===null || lastLeft !=left || lastTop ===null || lastTop !=top || lastWidth ===null || lastWidth !=width || lastHeight ===null || lastHeight !=height) {
+      // remember new data
+      button.left =left;
+      button.top =top;
+      button.absoluteLeft =offset.left;
+      button.absoluteTop =offset.top;
+      button.width =width;
+      button.height =height;
       
       // adjust positioning only if button is not focused
       if( !button.focused) {
@@ -622,24 +629,26 @@ function ButtonFollow( justReady) {
           style.width =width +'px';
           style.height =height +'px';
         }
-      }
-
-      // remember new data
-      button.left =left;
-      button.top =top;
-      button.absoluteLeft =offset.left;
-      button.absoluteTop =offset.top;
-      button.width =width;
-      button.height =height;
-
-      // button adjusted
-      
-      // if button is focused, adjust flash object position and size
-      if( button.focused) {
-        // adjust focused button's width and height
-        AdjustMovieToButton( button, justReady);
+        
       }
     }
+    
+    if( button.focused)
+      focusedButton =button;
+  }
+  
+  // move movie element over focused button
+  if( focusedButton !==null)
+    AdjustMovieToButton( focusedButton, justReady);
+  
+  if( justReady && focusedButton ===null) {
+    // now when object is inserted and initialized,
+    // we move it out of viewport because there are
+    // no buttons to focus on.
+    movieContainer.style.left ='-100px';
+    movieContainer.style.top ='-100px';
+    movieContainer.style.width ='1px';
+    movieContainer.style.height ='1px';
   }
 };
 
@@ -659,34 +668,36 @@ api.load =function() {
     BUGFIX: In IE "data" attribute is being added.
   */
   var html =
-    '<object id="fileUploader_OBJECT" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" width="1px" height="1px"' +( /* BUGFIX */ dependency.isAgentIE() ? ' data="' +config.swfUrl +'"' :'') +'>' +
+    '<object id="fileUploader_OBJECT" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" width="200px" height="200px"' +( /* BUGFIX */ dependency.isAgentIE() ? ' data="' +config.swfUrl +'"' :'') +'>' +
     	'<param name="allowScriptAccess" value="always" />' +
     	'<param name="movie" value="' +config.swfUrl +'" />' +
     	'<param name="wmode" value="transparent" />' +
     	'<param name="menu" value="false" />' +
     	'<param name="quality" value="low" />' +
     	'<param name="scale" value="exactfit" />' +
-    	'<param name="play" value="false" />' +
-    	'<param name="loop" value="false" />' +
     	'<param name="flashvars" value="elementId=fileUploader_OBJECT&amp;bridgeFn=fileUploader.bridge&amp;debugFn=fileUploader.debug&amp;visualDebug=' +(api.visualDebug ? '1' : '0') +'" />' +
-    	'<embed id="fileUploader_EMBED" src="' +config.swfUrl +'" flashvars="elementId=fileUploader_EMBED&amp;bridgeFn=fileUploader.bridge&amp;debugFn=fileUploader.debug&amp;visualDebug=' +(api.visualDebug ? '1' : '0') +'" width="1px" height="1px" allowScriptAccess="always" type="application/x-shockwave-flash" pluginspage="http://www.adobe.com/go/getflashplayer" wmode="transparent" menu="false" quality="low" scale="exactfit" play="false" loop="false" />' +
+    	'<embed id="fileUploader_EMBED" src="' +config.swfUrl +'" flashvars="elementId=fileUploader_EMBED&amp;bridgeFn=fileUploader.bridge&amp;debugFn=fileUploader.debug&amp;visualDebug=' +(api.visualDebug ? '1' : '0') +'" width="200px" height="200px" allowScriptAccess="always" type="application/x-shockwave-flash" pluginspage="http://www.adobe.com/go/getflashplayer" wmode="transparent" menu="false" quality="low" scale="exactfit" />' +
     '</object>';
   
   // create container element
   var div =document.createElement( 'DIV');
   // assign class
   div.className ='fileUploader';
-  // assign positioning
-  div.style.position ='absolute';
-  div.style.width ='200px';
-  div.style.height ='200px';
-  div.style.overflow ='hidden';
   // initially move element to the viewport so that firefox and other
   // browser optimizations initialize flash element instantly. When flash
   // will call 'ready' callback, the 'ready' callback with shift flash object
   // out of viewport.
+  div.style.position ='absolute';
   div.style.left =document.documentElement.scrollLeft +'px';
   div.style.top =document.documentElement.scrollTop +'px';
+  div.style.width ='200px';
+  div.style.height ='200px';
+  div.style.overflow ='hidden';
+
+  // in some browsers div.style.* applied attributes do not work,
+  // so apply style attribute to fix the problem.
+  div.setAttribute( 'style', 'position: absolute; left: ' +document.documentElement.scrollLeft +'px; top: ' +document.documentElement.scrollTop +'px; width: 200px; height: 200px; overflow: hidden;');
+  
   // assign content html
   div.innerHTML =html;
   
@@ -707,7 +718,7 @@ api.load =function() {
 
   // remember movie container element
   movieContainer =document.body.appendChild( div);
-  
+
   // BUGFIX: see if browser is IE, and if it is, see if flash ready callback
   // has already been received. If it was received and movie object is still
   // unresolved, do it now.
@@ -721,10 +732,10 @@ api.load =function() {
   }
   
   // create follower execution interval
-  followerTimer =setInterval( ButtonFollow, 500);
+  followerTimer =setInterval( ButtonFollowRoutine, 500);
   
   // bind window on resizing to adjust button positioning
-  dependency.bind( window, 'resize', ButtonFollow);
+  dependency.bind( window, 'resize', ButtonFollowRoutine);
 };
 
 // deinitialize uploader
@@ -760,7 +771,7 @@ api.unload =function(){
   api.ready =false;
   
   // remove window resizing callback
-  dependency.unbind( window, 'resize', ButtonFollow);
+  dependency.unbind( window, 'resize', ButtonFollowRoutine);
 };
 
 
@@ -849,6 +860,3 @@ api.readableVolume =function( bytes) {
 };
   
 })( window, window, document, window.fileUploaderDependency);
-
-// cleanup
-delete config;
