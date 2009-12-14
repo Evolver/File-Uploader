@@ -27,7 +27,7 @@ File Uploader is a flash-based file uploader, alternative to SWFUpload. It is ro
   <li>Display upload progress bars</li>
   <li>Display transfer rates (uploading speed)</li>
   <li>Display file names, sizes and types</li>
-  <li>Remove unnecessary files from queue before actual upload starts</li>
+  <li>Manipulate file upload queue</li>
   <li>Receive JSON or any other data from server as response</li>
   <li>Upload files to different URLs with different POST variables simultaneously</li>
 </ul>
