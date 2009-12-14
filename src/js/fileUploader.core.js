@@ -100,7 +100,7 @@ flash.handlers.ready =function( elementId) {
   
   // in case we had focus on button while flash was
   // loading, restore that focus
-  ButtonFollow();
+  ButtonFollow( true);
 };
 
 // file dialog is opened
@@ -504,9 +504,9 @@ function GetObjectAndEmbed() {
 
 // adjust movie container object to button position
 // and sizing
-function AdjustMovieToButton( button, justFocused) {
-  if( justFocused ===undefined)
-    justFocused =true;
+function AdjustMovieToButton( button, sendSettings) {
+  if( sendSettings ===undefined)
+    sendSettings =true;
     
   // assign new dimensions to movieContainer
   with( movieContainer.style) {
@@ -531,7 +531,7 @@ function AdjustMovieToButton( button, justFocused) {
     top =button.absoluteTop +'px';
   }
   
-  if( justFocused) {
+  if( api.ready && sendSettings) {
     // set active file selection settings
     flash.call.setSettings({
       'buttonId': button.settings.id,
@@ -575,7 +575,11 @@ function LooseButton() {
 // see which buttons are registered to the file uploader,
 // check if element positions / dimensions have changed,
 // and if so, adjust new overlay positioning
-function ButtonFollow() {
+function ButtonFollow( justReady) {
+  // check input
+  if( justReady ===undefined)
+    justReady =false;
+    
   // iterate all buttons
   var button;
   var overlay;
@@ -633,7 +637,7 @@ function ButtonFollow() {
       // if button is focused, adjust flash object position and size
       if( button.focused) {
         // adjust focused button's width and height
-        AdjustMovieToButton( button, false);
+        AdjustMovieToButton( button, justReady);
       }
     }
   }
