@@ -1,22 +1,26 @@
-
 <h1>File Uploader</h1>
 
 File Uploader is a flash-based file uploader, alternative to SWFUpload. It is robust, fast and easy to use. It is meant to be used on a web pages to replace standard &lt;input type="file" /&gt;.
 
-<b style="color:red;">File Uploader is under development and it's implementation is experimental. No stable release is currently available.</b>
+<b>File Uploader is under development and it's implementation is experimental. No stable release is currently available. I am seeking for File Uploader testers. If you have downloaded File Uploader, tested it and found issues using it, please let me know what those issues were, I will fix the problem as soon as possible.</b>
+
+<i>Why to create File Uploader when there are alternatives like <a href="http://www.swfupload.org">SWFUpload</a> available out there?</i><br />
+File Uploader is inspired from SWFUpload. The problem with SWFUpload is that it is not optimized for usage on a web pages where you have lots of 'upload buttons' on single page. The kind of pages could be administration panels with some kind of category list, where in front of each category you have an icon, and that icon, when clicked, allows you to instantly replace it by uploading selected file from popped-up dialog window. When you use SWFUpload to do such things, the computer resource usage grows with each new upload button instance, because everytime you instantiate new SWFUpload object, SWFUpload embeds one more SWF file instance on to the page, this means that at the end you have as much SWF's (Flash players) running as 'upload buttons' you have. If you allocate too much buttons, the browser could crash because of lack of resources. To work around this problem i was trying to implement a solution where you mouseover an icon, you get a new SWFUpload instance immediately, and when mouseout the icon, SWFUpload instance is getting destroyed. This solution did not work a minute, because of a bug i described <a href="http://github.com/Evolver/browser-bugs/tree/master/flash/file-dialog-crash/">here</a>. The browser kept on crashing because of Flash &lt;OBJECT&gt; being removed from DOM while file dialog is open. Here is how File Uploader was born and what issues it is meant to solve.
 
 <h2>What makes it great:</h2>
 
 <ul>
-  <li>Lighweight, uses one SWF embed for all uploader instances on single page</li>
-  <li>Supports multiple file selection and parallel uploading</li>
+  <li>Lighweight, uses one SWF embed for all uploader instances (buttons) on page.</li>
+  <li>Supports multiple file selection and parallel file uploading</li>
   <li>Supports multiple uploaders (queues) per page without impact on performance</li>
   <li>Supports per-file POST arguments</li>
+  <li>Provides many configuration settings to adjust File Uploader behavior to your needs</li>
+  <li>Provides transfer rate (speed) calculation during file upload</li>
   <li>Easy-to-use high level API out of box</li>
   <li>Exports low level API to create custom high level APIs</li>
   <li>Supports automatic upload start</li>
   <li>Designed to support any JavaScript library</li>
-  <li>Licensed under <a href="http://www.gnu.org/licenses/gpl-2.0.html">GPL v2</a></li>
+  <li>Code is Open Source, licensed under <a href="http://www.gnu.org/licenses/gpl-2.0.html">GPL v2</a></li>
 </ul>
 
 <h2>With File Uploader you can:</h2>
