@@ -10,22 +10,24 @@ File Uploader is inspired from SWFUpload. The problem with SWFUpload is that it 
 <h2>What makes it great:</h2>
 
 <ul>
-  <li>Lighweight, uses one SWF embed for all uploader instances (buttons) on page.</li>
-  <li>Supports multiple file selection and parallel file uploading</li>
-  <li>Supports multiple uploaders (queues) per page without impact on performance</li>
-  <li>Supports per-file POST arguments</li>
+  <li>Lighweight, <b>uses one SWF embed for all uploader instances</b> (buttons) on page.</li>
+  <li>Supports <b>multiple file selection in one dialog window</b> and <b>parallel file uploading</b></li>
+  <li>Supports <b>multiple uploaders (queues) per page</b> without impact on performance</li>
+  <li>Supports <b>per-file POST arguments</b></li>
   <li>Provides many configuration settings to adjust File Uploader behavior to your needs</li>
-  <li>Provides transfer rate (speed) calculation during file upload</li>
+  <li>Provides <b>transfer rate (speed) calculation</b> during file upload</li>
+  <li>Allows you to use <b>any custom HTML as clickable 'upload button'</b></li>
   <li>Easy-to-use high level API out of box</li>
   <li>Exports low level API to create custom high level APIs</li>
-  <li>Supports automatic upload start</li>
-  <li>Designed to support any JavaScript library</li>
-  <li>Code is Open Source, licensed under <a href="http://www.gnu.org/licenses/gpl-2.0.html">GPL v2</a></li>
+  <li>Supports <b>automatic upload start</b></li>
+  <li>Designed to <b>support any JavaScript library</b></li>
+  <li>Code is <b>Open Source</b>, licensed under <a href="http://www.gnu.org/licenses/gpl-2.0.html">GPL v2</a></li>
 </ul>
 
 <h2>With File Uploader you can:</h2>
 
 <ul>
+  <li>Use any HTML code as clickable 'upload button'</li>
   <li>Select multiple files for uploading</li>
   <li>Upload selected files asynchronously (without submitting the form, just like AJAX works)</li>
   <li>Display upload progress bars</li>
