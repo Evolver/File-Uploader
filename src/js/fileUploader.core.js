@@ -51,7 +51,11 @@ var config =api.config ={
   // flash file URL
   'swfUrl': '/bin/flash/FileUploader.swf',
   // zIndex to assign to flash file container
-  'zIndex': 9999
+  'zIndex': 9999,
+  // enable visual debugging
+  'visualDebug': false,
+  // forced positioning of elements
+  'forcedPositioning': false
 };
 
 // read-only property to see if uploader is initialized for
@@ -63,9 +67,6 @@ api.debug =function( msg){
   // override this method from outside world to receive debug
   //  messages
 };
-
-// show alpha-transparent red rectangle over button elements
-api.visualDebug =false;
 
 // methods to handle flash events / call flash methods
 var flash ={};
@@ -309,6 +310,12 @@ api.bridge =function( elementId, methodName, args) {
 
 // create new button over element
 api.create =function( elem, settings) {
+  // see if file uploader is initialized
+  if( movieContainer ===null) {
+    // initialize file uploader
+    api.load();
+  }
+  
   // make sure settings object is instantiated
   if( settings ===undefined)
     settings ={};
@@ -328,18 +335,17 @@ api.create =function( elem, settings) {
   // set absolute positioning
   div.style.position ='absolute';
   
+  if( config.visualDebug) {
+    // enable visual debugging
+    div.setAttribute( 'style', 'position: absolute; border: dashed 1px green;');
+  }
+  
   // insert element after specified element
   elem.parentNode.appendChild( div);
   
   // when mouse is over this element, move flash object right over
   // the overlay
   dependency.bind( div, 'mouseenter', function() {
-    // see if file uploader is initialized
-    if( movieContainer ===null) {
-      // initialize file uploader
-      api.load();
-    }
-    
     // focus target element
     FocusButton( elem);
   });
@@ -375,10 +381,8 @@ api.remove =function( elem) {
       // button found
       button =buttons[i];
       
-      // see if button was focused
-      if( button.focused)
-        // loose focused button
-        LooseButton();
+      // loose any focused button
+      LooseButton();
         
       // remove button from array
       buttons.splice( i, 1);
@@ -439,12 +443,15 @@ function GetButtonById( id) {
 
 // focus target element
 function FocusButton( elem) {
+  // loose any focused buttons
+  LooseButton();
+  
   // find target button
   var button =null;
   for( var i =0; i < buttons.length; ++i) {
-    if( buttons[i].elem ===elem) {
-      // reference target button
-      button =buttons[i];
+    var button =buttons[i];
+    if( button.elem ===elem) {
+      // button found
       break;
     }
   }
@@ -471,6 +478,9 @@ function FocusButton( elem) {
     width ='1px';
     height ='1px';
   }
+  
+  // follow button
+  ButtonFollow();
 };
 
 // get OBJECT and EMBED tags from within movieContainer
@@ -535,32 +545,47 @@ function AdjustMovieToButton( button, sendSettings) {
 
 // loose button from focus
 function LooseButton() {
-  // squeeze the button so it does not get accidentally hovered
-  var elems =GetObjectAndEmbed();
-  var i;
-  for( i =0; i < elems.length; ++i) {
-    with( elems[ i].style) {
-      width ='1px';
-      height ='1px';
-    }
-  }
+  // had focus flag
+  var hadFocus =false;
+  var button;
   
   // find focused button and change it's focus status
   for( var i =0; i < buttons.length; ++i) {
-    if( buttons[i].focused) {
-      // button has lost it's focus
-      buttons[i].focused =false;
+    button =buttons[i];
+    
+    if( button.focused) {
+      // found at least one focused button
+      hadFocus =true;
+      
+      // remove focus flag
+      button.focused =false;
+      
       // force repositioning
-      buttons[i].top =null;
-      buttons[i].left =null;
+      button.top =null;
+      button.left =null;
+      button.width =null;
+      button.height =null;
     }
   }
   
-  // assign initial settings
-  movieContainer.style.width ='1px';
-  movieContainer.style.height ='1px';
-  movieContainer.style.left ='-100px';
-  movieContainer.style.top ='-100px';
+  if( hadFocus) {
+    // squeeze the button so it does not get accidentally hovered only
+    //  if there were focused buttons active
+    var elems =GetObjectAndEmbed();
+    var i;
+    for( i =0; i < elems.length; ++i) {
+      with( elems[ i].style) {
+        width ='1px';
+        height ='1px';
+      }
+    }
+    
+    // assign initial settings
+    movieContainer.style.width ='1px';
+    movieContainer.style.height ='1px';
+    movieContainer.style.left ='-100px';
+    movieContainer.style.top ='-100px';
+  }
   
   // assign new button positions
   ButtonFollow();
@@ -598,25 +623,54 @@ function ButtonFollow( justReady) {
     var lastWidth =button.width;
     var lastHeight =button.height;
     
-    // get bounding rect
+    // get offsets and metrics
     var offset =dependency.getElementOffset( elem);
-    var relativeOffset =dependency.getElementRelativeOffset( elem);
     
-    // determine current element position on the screen
-    var left =relativeOffset.left;
-    var top =relativeOffset.top;
+    // data to obtain
+    var top, left, width, height;
+    
+    // see if button is hidden or removed from DOM
+    if( !dependency.isElementVisible( elem) || !elem.parentNode) {
+      // TODO: implement way to determine if node is no more used (removed from DOM) to
+      //  automatically remove button reference from element.
+      top =-100;
+      left =-100;
+      width =1;
+      height =1;
+      
+    } else {
+      // element is visible and is still in DOM
+      var relativeParent =dependency.getElementRelativeParent( elem);
+      var relativeOffset =dependency.getElementRelativeOffset( elem);
+      
+      // determine current element position on the screen.
+      left =relativeOffset.left;
+      top =relativeOffset.top;
+      
+      // see if relative parent is body tag, and if it is not, take in count
+      //  element scrollings
+      if( relativeParent.nodeName !='BODY') {
+        var relativeScrolling =dependency.getElementScrolling( relativeParent);
+        
+        // add scrolling offsets
+        left +=relativeScrolling.left;
+        top +=relativeScrolling.top;
+      }
+  
+      // get width and height
+      width =dependency.getElementOuterWidth( elem);
+      height =dependency.getElementOuterHeight( elem);
+      
+      // remember absolute positioning
+      button.absoluteLeft =offset.left;
+      button.absoluteTop =offset.top;
+    }
 
-    // get width and height
-    var width =dependency.getElementOuterWidth( elem);
-    var height =dependency.getElementOuterHeight( elem);
-    
     // see if positioning needs to be changed
-    if( justReady || lastLeft ===null || lastLeft !=left || lastTop ===null || lastTop !=top || lastWidth ===null || lastWidth !=width || lastHeight ===null || lastHeight !=height) {
+    if( justReady || config.forcedPositioning || lastLeft ===null || lastLeft !=left || lastTop ===null || lastTop !=top || lastWidth ===null || lastWidth !=width || lastHeight ===null || lastHeight !=height) {
       // remember new data
       button.left =left;
       button.top =top;
-      button.absoluteLeft =offset.left;
-      button.absoluteTop =offset.top;
       button.width =width;
       button.height =height;
       
@@ -629,7 +683,6 @@ function ButtonFollow( justReady) {
           style.width =width +'px';
           style.height =height +'px';
         }
-        
       }
     }
     
@@ -637,11 +690,11 @@ function ButtonFollow( justReady) {
       focusedButton =button;
   }
   
-  // move movie element over focused button
-  if( focusedButton !==null)
+  if( focusedButton !==null) {
+    // move movie element over focused button
     AdjustMovieToButton( focusedButton, justReady);
-  
-  if( justReady && focusedButton ===null) {
+    
+  } else if( justReady) {
     // now when object is inserted and initialized,
     // we move it out of viewport because there are
     // no buttons to focus on.
@@ -675,8 +728,8 @@ api.load =function() {
     	'<param name="menu" value="false" />' +
     	'<param name="quality" value="low" />' +
     	'<param name="scale" value="exactfit" />' +
-    	'<param name="flashvars" value="elementId=fileUploader_OBJECT&amp;bridgeFn=fileUploader.bridge&amp;debugFn=fileUploader.debug&amp;visualDebug=' +(api.visualDebug ? '1' : '0') +'" />' +
-    	'<embed id="fileUploader_EMBED" src="' +config.swfUrl +'" flashvars="elementId=fileUploader_EMBED&amp;bridgeFn=fileUploader.bridge&amp;debugFn=fileUploader.debug&amp;visualDebug=' +(api.visualDebug ? '1' : '0') +'" width="200px" height="200px" allowScriptAccess="always" type="application/x-shockwave-flash" pluginspage="http://www.adobe.com/go/getflashplayer" wmode="transparent" menu="false" quality="low" scale="exactfit" />' +
+    	'<param name="flashvars" value="elementId=fileUploader_OBJECT&amp;bridgeFn=fileUploader.bridge&amp;debugFn=fileUploader.debug&amp;visualDebug=' +(config.visualDebug ? '1' : '0') +'" />' +
+    	'<embed id="fileUploader_EMBED" src="' +config.swfUrl +'" flashvars="elementId=fileUploader_EMBED&amp;bridgeFn=fileUploader.bridge&amp;debugFn=fileUploader.debug&amp;visualDebug=' +(config.visualDebug ? '1' : '0') +'" width="200px" height="200px" allowScriptAccess="always" type="application/x-shockwave-flash" pluginspage="http://www.adobe.com/go/getflashplayer" wmode="transparent" menu="false" quality="low" scale="exactfit" />' +
     '</object>';
   
   // create container element
@@ -731,7 +784,7 @@ api.load =function() {
     movie =window[ movieId];
   }
   
-  // create follower execution interval
+  // create button follower delayed execution
   followerTimer =setInterval( ButtonFollowRoutine, 500);
   
   // bind window on resizing to adjust button positioning
@@ -750,11 +803,13 @@ api.unload =function(){
     flash.call.shutdown();
   }
   
-  // stop follower interval
-  clearInterval( followerTimer);
-  
-  // reset interval
-  followerTimer =null;
+  if( followerTimer !==null) {
+    // stop follower interval
+    clearInterval( followerTimer);
+    
+    // reset interval
+    followerTimer =null;
+  }
   
   // remove all buttons
   while( buttons.length >0)
@@ -773,7 +828,6 @@ api.unload =function(){
   // remove window resizing callback
   dependency.unbind( window, 'resize', ButtonFollowRoutine);
 };
-
 
 // expose default handlers
 

@@ -48,7 +48,29 @@ api.fileUploaderDependency.getElementOffset =function( elem) {
   return $(elem).offset();
 };
 
-// get element relative offset
+// get element relative parent
+api.fileUploaderDependency.getElementRelativeParent =function( elem) {
+  var doc =elem.ownerDocument;
+  var body =doc.body;
+  
+  //return $(elem).offsetParent().get(0);
+  while( elem.parentNode) {
+    elem =elem.parentNode;
+    
+    if( elem.nodeName =='BODY' || elem.nodeName =='HTML')
+      return body;
+      
+    // get element style
+    var style =doc.defaultView ? doc.defaultView.getComputedStyle( elem, null) : elem.currentStyle;
+    
+    if( style.position !='static')
+      return elem;
+  }
+  
+  return body;
+};
+
+// get element relative parent offset
 api.fileUploaderDependency.getElementRelativeOffset =function( elem) {
   return $(elem).position();
 };
@@ -61,6 +83,19 @@ api.fileUploaderDependency.getElementOuterWidth =function( elem) {
 // get element outer height
 api.fileUploaderDependency.getElementOuterHeight =function( elem) {
   return $(elem).outerHeight();
+};
+
+// get element scrolling info
+api.fileUploaderDependency.getElementScrolling =function( elem) {
+  return {
+    'top': elem.scrollTop,
+    'left': elem.scrollLeft
+  };
+};
+
+// check if element is visible
+api.fileUploaderDependency.isElementVisible =function( elem) {
+  return $( elem).is( ':visible');
 };
 
 })( $, window);
