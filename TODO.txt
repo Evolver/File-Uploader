@@ -1,5 +1,5 @@
 - Graceful degradation if Flash fails to load.
 
-- Hide button overlays if button element is not visible.
-
 - Automatically determine if overlayed element is still in DOM, and if it is not, remove overlay.
+
+- Cancel active upload if single file button is clicked and new file is being selected.
