@@ -1,4 +1,4 @@
-/**
+﻿/**
   * Author: Dmitry Stepanov
   * E-Mail: dmitrij@stepanov.lv
   * URL: http://www.stepanov.lv
@@ -34,13 +34,17 @@ package evolver {
 		};
 	
 		// check if assertion is false, and if is, throw an exception
-		public static function assert( expr:Boolean) {
+		public static function assert( expr:Boolean, msg:String ='') {
 			if( !Debug.enable)
 				// debugging is off
 				return;
 				
-			if( !expr)
-				throw new Error( 'Assertion failed');
+			if( !expr) {
+				if( msg)
+					throw new Error( 'Assertion failed: ' +msg);
+				else
+					throw new Error( 'Assertion failed');
+			}
 		}
 		
 		// write message to debug console

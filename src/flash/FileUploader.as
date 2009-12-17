@@ -61,12 +61,6 @@ package {
 		// file id generator offset
 		var idOffset:uint =0;
 		
-		// single file reference
-		var singleFile:FileReference =new FileReference();
-		
-		// multiple file reference
-		var multipleFiles:FileReferenceList =new FileReferenceList();
-		
 		// settings
 		var settings:Object ={
 			// select multiple or single file
@@ -100,57 +94,62 @@ package {
 			JavaScript.bind( 'getActiveUploadCount', this.getActiveUploadCount);
 			JavaScript.bind( 'shutdown', this.shutdown);
 			
-			// create reference to current object
-			var self:FileUploader =this;
-			
-			// bind select event handler
-			this.singleFile.addEventListener( Event.SELECT, function(){
-				Debug.write( '[EVENT] singleFile: SELECT');
-				
-				// add file to queue
-				self.addFile( self.singleFile);
-				
-				// notify of dialog closure
-				self.fileDialogClosed();
-			});
-			
-			// bind close handlers
-			this.singleFile.addEventListener( Event.CANCEL, function(){
-				Debug.write( '[EVENT] singleFile: CANCEL');
-				
-				// window closed
-				self.fileDialogClosed();
-			});
-			
-			// bind select event handler
-			this.multipleFiles.addEventListener( Event.SELECT, function(){
-				Debug.write( '[EVENT] multipleFiles: SELECT');
-				
-				// iterate selected files and add them to queue
-				with( self.multipleFiles) {
-					for( var i =0; i < fileList.length; ++i)
-						self.addFile( fileList[ i]);
-				}
-				
-				// notify of dialog closure
-				self.fileDialogClosed();
-			});
-			
-			// bind close handlers
-			this.multipleFiles.addEventListener( Event.CANCEL, function(){
-				Debug.write( '[EVENT] multipleFiles: CANCEL');
-				
-				// window closed
-				self.fileDialogClosed();
-			});
-			
 			// call bridge method to notify of flash ready state
 			this.callExternal( 'ready');
+		}
+		
+		// get new FileReference on FileReferenceList object
+		protected function newFileReference( multi:Boolean =false) {
+			// create reference to current object
+			var self:FileUploader =this;
+			var ref =multi ? new FileReferenceList() : new FileReference();
+			
+			if( multi) {
+				// multiple file selection
+				ref.addEventListener( Event.SELECT, function(){
+					Debug.write( '[EVENT] dialog: SELECT single');
+					
+					// iterate selected files and add them to queue
+					with( ref) {
+						for( var i =0; i < fileList.length; ++i)
+							self.addFile( fileList[ i]);
+					}
+					
+					// notify of dialog closure
+					self.fileDialogClosed();
+				});
+				
+			} else {
+				// single file selection
+				ref.addEventListener( Event.SELECT, function(){
+					Debug.write( '[EVENT] dialog: SELECT MULTIPLE');
+					
+					// add file to queue
+					self.addFile( ref);
+					
+					// notify of dialog closure
+					self.fileDialogClosed();
+				});
+			}
+			
+			// close dialog
+			ref.addEventListener( Event.CANCEL, function(){
+				Debug.write( '[EVENT] dialog: CANCEL');
+				
+				// window closed
+				self.fileDialogClosed();
+			});
+			
+			// return reference
+			return ref;
 		}
 		
 		// opens file selection dialog
 		public function selectFiles() {
 			Debug.write( 'FileUploader::selectFile()');
+			
+			// get file reference object
+			var ref =this.newFileReference( this.settings.multi);
 			
 			try {
 				// create file filter
@@ -158,10 +157,7 @@ package {
 				
 				// try browsing file (this fails if the method is called not
 				// within user interaction event.
-				if( this.settings.multi)
-					this.multipleFiles.browse([ filter]);
-				else
-					this.singleFile.browse([ filter]);
+				ref.browse([ filter]);
 				
 				// file dialog was opened
 				this.fileDialogOpened();
@@ -240,7 +236,7 @@ package {
 			// uploading started
 			ref.addEventListener( Event.OPEN, function( e:Event){
 				Debug.write( '[EVENT] file - Event.OPEN');
-				Debug.assert( self.queue[ id] !==undefined);
+				Debug.assert( self.queue[ id] !==undefined, 'Event.OPEN : entry ' +id +' does not exist');
 				
 				// reference entry
 				var entry =self.queue[ id];
@@ -309,7 +305,7 @@ package {
 			// uploading completed
 			var uploadCompleteFn:Function =function( removeFromQueue:Boolean){
 				// make sure file is within queue
-				Debug.assert( self.queue[id] !==undefined);
+				Debug.assert( self.queue[id] !==undefined, 'uploadCompleteFn : entry ' +id +' does not exist');
 				
 				// reference entry
 				var entry =self.queue[id];
@@ -363,7 +359,7 @@ package {
 			
 			// uploading succeeded
 			var uploadSuccessFn:Function =function( serverData) {
-				Debug.assert( self.queue[ id] !==undefined);
+				Debug.assert( self.queue[ id] !==undefined, 'uploadSuccessFn : entry ' +id +' does not exist');
 				
 				// reference file
 				var file =self.queue[ id];
@@ -374,7 +370,7 @@ package {
 	
 			ref.addEventListener( Event.COMPLETE, function( e:Event){
 				Debug.write( '[EVENT] file - Event.COMPLETE');
-				Debug.assert( self.queue[ id] !==undefined);
+				Debug.assert( self.queue[ id] !==undefined, 'Event.COMPLETE : entry ' +id +' does not exist');
 				
 				// reference entry
 				var entry =self.queue[ id];
@@ -451,7 +447,8 @@ package {
 			ref.addEventListener( SecurityErrorEvent.SECURITY_ERROR, function( e:SecurityErrorEvent){
 				Debug.write( '[EVENT] file - SecurityErrorEvent.SECURITY_ERROR');
 				
-				uploadCompleteFn( uploadErrorFn( 'Security violation: ' +e.text));
+				// Removed because flash fires IEErrorEvent.IE_ERROR right after this event
+				//uploadCompleteFn( uploadErrorFn( 'Security violation: ' +e.text));
 			});
 			ref.addEventListener( IOErrorEvent.IO_ERROR, function( e:IOErrorEvent){
 				Debug.write( '[EVENT] file - IOErrorEvent.IO_ERROR');
@@ -459,16 +456,17 @@ package {
 				uploadCompleteFn( uploadErrorFn( 'I/O error: ' +e.text));
 			});
 			ref.addEventListener( HTTPStatusEvent.HTTP_STATUS, function( e:HTTPStatusEvent){
-				Debug.write( '[EVENT] file - HTTPStatusEvent.HTTP_STATUS');
+				Debug.write( '[EVENT] file - HTTPStatusEvent.HTTP_STATUS (' +e.status +')');
 				
-				uploadCompleteFn( uploadErrorFn( 'HTTP status error: ' +e.status));
+				// Removed because flash fires IEErrorEvent.IE_ERROR right after this event
+				//uploadCompleteFn( uploadErrorFn( 'HTTP status error: ' +e.status));
 			});
 		}
 		
 		// remove file by id
 		public function removeFile( i:uint) {
 			Debug.write( 'FileUploader::removeFile()');
-			Debug.assert( this.queue[ i] !==undefined);
+			Debug.assert( this.queue[ i] !==undefined, 'FileUploader::removeFile() : entry ' +i +' does not exist');
 			
 			if( this.queue[ i].state ==FileUploader.STATE_UPLOADING)
 				// stop uploading target file because file is being removed from queue
@@ -479,6 +477,9 @@ package {
 			
 			// delete file from queue
 			delete this.queue[i];
+			
+			// see if entry was actually deleted
+			Debug.assert( this.queue[ i] ===undefined, 'FileUploader::removeFile() : entry remains after deletion');
 		}
 		
 		// get file information from file reference object
@@ -493,7 +494,7 @@ package {
 		// get file by index
 		public function getFile( i:uint):Object {
 			Debug.write( 'FileUploader::getFile()');
-			Debug.assert( this.queue[ i] !==undefined);
+			Debug.assert( this.queue[ i] !==undefined, 'FileUploader::getFile() : entry ' +i +' does not exist');
 			
 			// return object by index
 			return this.getFileInfoFromRef( this.queue[ i].ref);
@@ -647,8 +648,8 @@ package {
 		// cancel uploading current file
 		public function stopUpload( i:uint) {
 			Debug.write( 'FileUploader::stopUpload()');
-			Debug.assert( this.queue[i] !==undefined);
-			Debug.assert( this.queue[i].state ==FileUploader.STATE_UPLOADING);
+			Debug.assert( this.queue[i] !==undefined, 'FileUploader::stopUpload() : entry ' +i +' does not exist');
+			Debug.assert( this.queue[i].state ==FileUploader.STATE_UPLOADING, 'FileUploader::stopUpload() : entry ' +i +' state = FileUploader.STATE_UPLOADING');
 			
 			var file:Object =this.queue[i];
 			
