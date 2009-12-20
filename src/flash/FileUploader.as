@@ -107,7 +107,7 @@ package {
 			if( multi) {
 				// multiple file selection
 				ref.addEventListener( Event.SELECT, function(){
-					Debug.write( '[EVENT] dialog: SELECT single');
+					Debug.write( '[EVENT] dialog: SELECT MULTIPLE');
 					
 					// iterate selected files and add them to queue
 					with( ref) {
@@ -122,7 +122,7 @@ package {
 			} else {
 				// single file selection
 				ref.addEventListener( Event.SELECT, function(){
-					Debug.write( '[EVENT] dialog: SELECT MULTIPLE');
+					Debug.write( '[EVENT] dialog: SELECT SINGLE');
 					
 					// add file to queue
 					self.addFile( ref);
