@@ -25,6 +25,11 @@
 
 var undefined;
 
+// function to check if user agent is MSIE
+function IsAgentIE() {
+	return document.attachEvent !==undefined;
+}
+
 // movie object id
 var movieId =null;
 
@@ -87,7 +92,7 @@ flash.handlers.ready =function( elementId) {
     // BUGFIX: this can fail in IE, because IE initializes DOM after flash
     // initialization is complete. This is not valid behavior, so we
     // allow IE to pass this exception.
-    if( !dependency.isAgentIE())
+    if( !IsAgentIE())
       throw 'Did not found movie object #' +elementId +' during flash initialization';
   }
       
@@ -330,38 +335,25 @@ api.create =function( elem, settings) {
   if( settings.multi ===undefined)
     settings.multi =true;
   
-  // create button instance
-  var div =document.createElement( 'DIV');
-  // set absolute positioning
-  div.style.position ='absolute';
-  
-  if( config.visualDebug) {
-    // enable visual debugging
-    div.setAttribute( 'style', 'position: absolute; border: dashed 1px green;');
-  }
-  
-  // insert element after specified element
-  elem.parentNode.appendChild( div);
+  var mouseEnterHandler =function() {
+    // focus target element
+    FocusButton( elem);
+  };
   
   // when mouse is over this element, move flash object right over
   // the overlay
-  dependency.bind( div, 'mouseenter', function() {
-    // focus target element
-    FocusButton( elem);
-  });
+  dependency.bind( elem, 'mouseenter', mouseEnterHandler);
   
   // create new button
   buttons.push({
     'elem': elem,
-    'overlay': div,
     'left': null,
     'top': null,
-    'absoluteLeft': null,
-    'absoluteTop': null,
     'width': null,
     'height': null,
     'focused': false,
-    'settings': settings
+    'settings': settings,
+    'mouseEnterHandler': mouseEnterHandler
   });
   
   // execute button follower immediately
@@ -373,6 +365,7 @@ api.create =function( elem, settings) {
 
 // remove button from element
 api.remove =function( elem) {
+	// button reference
   var button =null;
   
   // find element
@@ -393,11 +386,9 @@ api.remove =function( elem) {
   // see if element was wrapped
   if( button ===null)
     throw 'Element is not wrapped via file uploader';
-    
-  with( button) {
-    // remove overlay element from DOM
-    overlay.parentNode.removeChild( overlay);
-  }
+  
+  // remove installed event handler from element
+  dependency.unbind( button.elem, 'mouseenter', button.mouseEnterHandler);
 };
 
 // update button settings
@@ -471,14 +462,6 @@ function FocusButton( elem) {
   // of other elements (IE bug fix)
   movieContainer.style.zIndex =config.zIndex;
   
-  // move button overlay off the viewport
-  with( button.overlay.style) {
-    left ='-100px';
-    top ='-100px';
-    width ='1px';
-    height ='1px';
-  }
-  
   // follow button
   ButtonFollow();
 };
@@ -528,8 +511,8 @@ function AdjustMovieToButton( button, sendSettings) {
   
   // assign new positioning
   with( movieContainer.style) {
-    left =button.absoluteLeft +'px';
-    top =button.absoluteTop +'px';
+    left =button.left +'px';
+    top =button.top +'px';
   }
   
   if( api.ready && sendSettings) {
@@ -604,16 +587,17 @@ function ButtonFollow( justReady) {
   if( justReady ===undefined)
     justReady =false;
     
-  // iterate all buttons
   var button;
-  var overlay;
+  //var overlay;
   var elem;
   var style;
   var focusedButton =null;
+  
+  // iterate all buttons
   for( var i =0; i < buttons.length; ++i) {
     button =buttons[i];
     
-    overlay =button.overlay;
+    //overlay =button.overlay;
     elem =button.elem;
 
     // Check dimensions and positioning. Get last
@@ -622,9 +606,6 @@ function ButtonFollow( justReady) {
     var lastTop =button.top;
     var lastWidth =button.width;
     var lastHeight =button.height;
-    
-    // get offsets and metrics
-    var offset =dependency.getElementOffset( elem);
     
     // data to obtain
     var top, left, width, height;
@@ -639,31 +620,16 @@ function ButtonFollow( justReady) {
       height =1;
       
     } else {
-      // element is visible and is still in DOM
-      var relativeParent =dependency.getElementRelativeParent( elem);
-      var relativeOffset =dependency.getElementRelativeOffset( elem);
-      
-      // determine current element position on the screen.
-      left =relativeOffset.left;
-      top =relativeOffset.top;
-      
-      // see if relative parent is body tag, and if it is not, take in count
-      //  element scrollings
-      if( relativeParent.nodeName !='BODY') {
-        var relativeScrolling =dependency.getElementScrolling( relativeParent);
-        
-        // add scrolling offsets
-        left +=relativeScrolling.left;
-        top +=relativeScrolling.top;
-      }
+    	// get offset
+    	var rect =dependency.getRect( elem);
+    	
+    	// store new offsets
+      top =rect.top;
+      left =rect.left;
   
       // get width and height
       width =dependency.getElementOuterWidth( elem);
       height =dependency.getElementOuterHeight( elem);
-      
-      // remember absolute positioning
-      button.absoluteLeft =offset.left;
-      button.absoluteTop =offset.top;
     }
 
     // see if positioning needs to be changed
@@ -673,17 +639,6 @@ function ButtonFollow( justReady) {
       button.top =top;
       button.width =width;
       button.height =height;
-      
-      // adjust positioning only if button is not focused
-      if( !button.focused) {
-        // adjust positioning of overlay so it is right over the button
-        with( overlay) {
-          style.left =left +'px';
-          style.top =top +'px';
-          style.width =width +'px';
-          style.height =height +'px';
-        }
-      }
     }
     
     if( button.focused)
@@ -721,7 +676,7 @@ api.load =function() {
     BUGFIX: In IE "data" attribute is being added.
   */
   var html =
-    '<object id="fileUploader_OBJECT" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" width="200px" height="200px"' +( /* BUGFIX */ dependency.isAgentIE() ? ' data="' +config.swfUrl +'"' :'') +'>' +
+    '<object id="fileUploader_OBJECT" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" width="200px" height="200px"' +( /* BUGFIX */ IsAgentIE() ? ' data="' +config.swfUrl +'"' :'') +'>' +
     	'<param name="allowScriptAccess" value="always" />' +
     	'<param name="movie" value="' +config.swfUrl +'" />' +
     	'<param name="wmode" value="transparent" />' +
@@ -734,22 +689,43 @@ api.load =function() {
   
   // create container element
   var div =document.createElement( 'DIV');
+  
   // assign class
   div.className ='fileUploader';
+  
   // initially move element to the viewport so that firefox and other
   // browser optimizations initialize flash element instantly. When flash
   // will call 'ready' callback, the 'ready' callback with shift flash object
   // out of viewport.
-  div.style.position ='absolute';
-  div.style.left =document.documentElement.scrollLeft +'px';
-  div.style.top =document.documentElement.scrollTop +'px';
+  
+  // get scrolling offset
+  var scrollTop =document.documentElement.scrollTop;
+  var scrollLeft =document.documentElement.scrollLeft;
+  
+  if( document.body !==undefined) {
+  	if( scrollTop < document.body.scrollTop)
+  		scrollTop =document.body.scrollTop;
+  	if( scrollLeft < document.body.scrollLeft)
+  		scrollLeft =document.body.scrollLeft;
+  }
+  
+  // apply style
+  div.style.position ='fixed';
+  div.style.left =scrollLeft +'px';
+  div.style.top =scrollTop +'px';
   div.style.width ='200px';
   div.style.height ='200px';
   div.style.overflow ='hidden';
-
-  // in some browsers div.style.* applied attributes do not work,
+  
+  // in some browsers div.style.* applied attributes do not work at current step,
   // so apply style attribute to fix the problem.
-  div.setAttribute( 'style', 'position: absolute; left: ' +document.documentElement.scrollLeft +'px; top: ' +document.documentElement.scrollTop +'px; width: 200px; height: 200px; overflow: hidden;');
+  div.setAttribute( 'style',
+  	'position: fixed;' +
+  	'left: ' +scrollLeft +'px;' +
+  	'top: ' +scrollTop +'px;' +
+  	'width: 200px;' +
+  	'height: 200px;' +
+  	'overflow: hidden;');
   
   // assign content html
   div.innerHTML =html;
@@ -775,7 +751,7 @@ api.load =function() {
   // BUGFIX: see if browser is IE, and if it is, see if flash ready callback
   // has already been received. If it was received and movie object is still
   // unresolved, do it now.
-  if( api.ready && dependency.isAgentIE() && movie ===null) {
+  if( api.ready && IsAgentIE() && movie ===null) {
     // see if movie is defined within window
     if( window[ movieId] ===undefined)
       throw 'window[' +movieId +'] is not defined';

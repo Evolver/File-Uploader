@@ -21,16 +21,17 @@
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
   */
 
-(function( $, fileUploader){
+(function( lib, namespace, fileUploader){
   
-var undefined;
+// declare namespace
+var api =lib.namespace( namespace), undefined;
 
 // override Uploader prototype
 with( fileUploader.Uploader.prototype) {
 	
 	// handle dialog open
   onDialogOpen =function() {
-    $(this.elem).triggerHandler( 'uploadDialogOpen');
+  	lib.event.trigger( this.elem, 'uploadDialogOpen');
   };
   
   // handle file selection
@@ -40,8 +41,7 @@ with( fileUploader.Uploader.prototype) {
       'value': true
     };
     
-    // trigger callback
-    $(this.elem).triggerHandler( 'uploadFileSelect', {
+    lib.event.trigger( this.elem, 'uploadFileSelect', {
       'fileId': id,
       'fileInfo': fileInfo,
       'returnData': returnData
@@ -53,7 +53,7 @@ with( fileUploader.Uploader.prototype) {
   
   // handle file removal
   onRemove =function( id, fileInfo) {
-    $(this.elem).triggerHandler( 'uploadFileRemove', {
+  	lib.event.trigger( this.elem, 'uploadFileRemove', {
       'fileId': id,
       'fileInfo': fileInfo
     });
@@ -61,12 +61,12 @@ with( fileUploader.Uploader.prototype) {
   
   // handle dialog closure
   onDialogClose =function() {
-    $(this.elem).triggerHandler( 'uploadDialogClose');
+  	lib.event.trigger( this.elem, 'uploadDialogClose');
   };
   
   // handle file uploading start
   onUploadStart =function( id, fileInfo) {
-    $(this.elem).triggerHandler( 'uploadStart', {
+  	lib.event.trigger( this.elem, 'uploadStart', {
       'fileId': id,
       'fileInfo': fileInfo
     });
@@ -74,7 +74,7 @@ with( fileUploader.Uploader.prototype) {
   
   // handle file uploading progress
   onUploadProgress =function( id, fileInfo, bytesLoaded, bytesTotal, percComplete) {
-    $(this.elem).triggerHandler( 'uploadProgress', {
+  	lib.event.trigger( this.elem, 'uploadProgress', {
       'fileId': id,
       'fileInfo': fileInfo,
       'bytesLoaded': bytesLoaded,
@@ -85,7 +85,7 @@ with( fileUploader.Uploader.prototype) {
   
   // handle file uploading transfer rate
   onUploadTransferRate =function( id, fileInfo, speed, avgSpeed) {
-    $(this.elem).triggerHandler( 'uploadTransferRate', {
+  	lib.event.trigger( this.elem, 'uploadTransferRate', {
       'fileId': id,
       'fileInfo': fileInfo,
       'speed': speed,
@@ -95,7 +95,7 @@ with( fileUploader.Uploader.prototype) {
   
   // handle file uploading completion, enter server response awaiting state
   onUploadAwaitingResponse =function( id, fileInfo) {
-    $(this.elem).triggerHandler( 'uploadWaitResponse', {
+    lib.event.trigger( this.elem, 'uploadWaitResponse', {
       'fileId': id,
       'fileInfo': fileInfo
     });
@@ -103,7 +103,7 @@ with( fileUploader.Uploader.prototype) {
   
   // handle file uploading error
   onUploadError =function( id, fileInfo, errorMsg) {
-    $(this.elem).triggerHandler( 'uploadError', {
+    lib.event.trigger( this.elem, 'uploadError', {
       'fileId': id,
       'fileInfo': fileInfo,
       'errorMsg': errorMsg
@@ -112,7 +112,7 @@ with( fileUploader.Uploader.prototype) {
   
   // handle file uploading success
   onUploadSuccess =function( id, fileInfo, serverData, filesRemaining) {
-    $(this.elem).triggerHandler( 'uploadSuccess', {
+  	lib.event.trigger( this.elem, 'uploadSuccess', {
       'fileId': id,
       'fileInfo': fileInfo,
       'serverData': serverData,
@@ -122,7 +122,7 @@ with( fileUploader.Uploader.prototype) {
   
   // handle file uploading completion
   onUploadComplete =function( id, fileInfo, filesPending, removeFromQueue) {
-    $(this.elem).triggerHandler( 'uploadComplete', {
+  	lib.event.trigger( this.elem, 'uploadComplete', {
       'fileId': id,
       'fileInfo': fileInfo,
       'filesPending': filesPending,
@@ -130,16 +130,10 @@ with( fileUploader.Uploader.prototype) {
     });
   };
 }
-  
-// expose jQuery function to instantiate uploader instances
-$.fn.uploader =function( defaultUploadData) {
-  if( this.size() !=1)
-    throw 'You can initialize one uploader button at a time';
-    
-  // get element reference
-  var elem =this.get(0);
-  
-  // return uploader instance
+
+// initialize uploader instance for target element
+api.attach =function( elem, defaultUploadData) {
+	// return uploader instance
   var uploader =new fileUploader.Uploader( defaultUploadData);
   
   // attach uploader
@@ -148,5 +142,5 @@ $.fn.uploader =function( defaultUploadData) {
   // return uploader instance
   return uploader;
 };
-  
-})( jQuery, window.fileUploader);
+
+})( EVOLIB_EXPORT, 'uploader', window.fileUploader);
