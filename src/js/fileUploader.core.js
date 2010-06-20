@@ -67,11 +67,8 @@ flash.handlers.ready =function( elementId) {
 	
 	// try to obtain reference to movie element
 	if(( movie =document.getElementById( elementId)) ===null) {
-		// BUGFIX: this can fail in IE, because IE initializes DOM after flash
-		// initialization is complete. This is not valid behavior, so we
-		// allow IE to pass this exception.
-		if( !IsAgentIE())
-			throw 'Did not found movie object #' +elementId +' during flash initialization';
+		// movie object not loaded
+		throw 'Did not found movie object #' +elementId +' during flash initialization';
 	}
 			
 	// set ready flag
@@ -635,6 +632,8 @@ function ButtonFollow( justReady) {
 		movieContainer.style.top ='-100px';
 		movieContainer.style.width ='1px';
 		movieContainer.style.height ='1px';
+		
+		api.debug( 'Shifted movie container out of viewport after flash has loaded');
 	}
 };
 
@@ -710,9 +709,6 @@ api.load =function() {
 		'height: 200px;' +
 		'overflow: hidden;');
 	
-	// assign content html
-	div.innerHTML =html;
-	
 	// when mouse is out the container, unfocus it (bring behind the scenes)
 	dependency.bind( div, 'mouseleave', function() {
 		if( !api.ready)
@@ -724,24 +720,21 @@ api.load =function() {
 	});
 	
 	// capture all clicks on the target div, avoid event bubbling
+	
+	// FIXME: the propagation stopping may be dependency-wise. Add propagation
+	//  stopping handler function to avoit click bubbling.
 	dependency.bind( div, 'click', function(){
 		return false;
 	});
-
+	
+	// report
+	api.debug( 'Injecting flash into DOM');
+	
 	// remember movie container element
 	movieContainer =document.body.appendChild( div);
-
-	// BUGFIX: see if browser is IE, and if it is, see if flash ready callback
-	// has already been received. If it was received and movie object is still
-	// unresolved, do it now.
-	if( api.ready && IsAgentIE() && movie ===null) {
-		// see if movie is defined within window
-		if( window[ movieId] ===undefined)
-			throw 'window[' +movieId +'] is not defined';
-
-		// get movie element from window object
-		movie =window[ movieId];
-	}
+	
+	// assign content html
+	div.innerHTML =html;
 	
 	// create button follower delayed execution
 	followerTimer =setInterval( ButtonFollowRoutine, 500);
