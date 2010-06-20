@@ -640,9 +640,14 @@ function ButtonFollow( justReady) {
 
 // initialize uploader
 api.load =function() {
+	
 	if( movieContainer !==null)
 		// already loaded
 		return;
+	
+	if( document.body ===undefined || document.body ===null)
+		// incorrect loading stage
+		throw 'File Uploader can be loaded only when document.body is available';
 		
 	/*
 		Inject OBJECT into DOM. 24h wasted on fixing this one, thanks to Microsoft.
@@ -680,12 +685,12 @@ api.load =function() {
 	var scrollTop =document.documentElement.scrollTop;
 	var scrollLeft =document.documentElement.scrollLeft;
 	
-	if( document.body !==undefined) {
-		if( scrollTop < document.body.scrollTop)
-			scrollTop =document.body.scrollTop;
-		if( scrollLeft < document.body.scrollLeft)
-			scrollLeft =document.body.scrollLeft;
-	}
+	// in case if user agent registers scrolling on body element,
+	//  gather scrolling info from document body.
+	if( scrollTop < document.body.scrollTop)
+		scrollTop =document.body.scrollTop;
+	if( scrollLeft < document.body.scrollLeft)
+		scrollLeft =document.body.scrollLeft;
 	
 	// apply style
 	div.style.position ='fixed';
