@@ -461,35 +461,43 @@ function GetObjectAndEmbed() {
 	return elems;
 };
 
-// adjust movie container object to button position
-// and sizing
+//adjust movie container object to button position
+//and sizing
 function AdjustMovieToButton( button, sendSettings) {
 	if( sendSettings ===undefined)
 		sendSettings =true;
-		
+	   
 	// assign new dimensions to movieContainer
 	with( movieContainer.style) {
 		width =button.width +'px';
 		height =button.height +'px';
 	}
-	
+
 	// assign new dimensions to the object element
 	// and embed element, if used
-	var elems =GetObjectAndEmbed();
+	var elems =GetObjectAndEmbed(), elem;
 	var i;
 	for( i =0; i < elems.length; ++i) {
-		with( elems[ i].style) {
-			width =button.width +'px';
-			height =button.height +'px';
+		elem =elems[ i];
+
+		// assign dimensions
+		elem.style.width =button.width +'px';
+		elem.style.height =button.height +'px';
+	   
+		if( button.elem.hasAttribute( 'title')) {
+			// assign title attribute (so that tooltip appears)
+			elem.setAttribute( 'title', button.elem.getAttribute( 'title'));
+		   
+		} else {
+			// assign no title attribute
+			elem.removeAttribute( 'title');
 		}
 	}
-	
+
 	// assign new positioning
-	with( movieContainer.style) {
-		left =button.left +'px';
-		top =button.top +'px';
-	}
-	
+	movieContainer.style.left =button.left +'px';
+	movieContainer.style.top =button.top +'px';
+
 	if( api.ready && sendSettings) {
 		// set active file selection settings
 		flash.call.setSettings({
